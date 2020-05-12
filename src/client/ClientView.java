@@ -40,10 +40,10 @@ public class ClientView extends Canvas{
             fileWriter.close();
         }
     }
+
     public static void main(String[] args) throws IOException {
         ReadConfig();
         JFrame frame = new JFrame("Splendor");
-        System.out.println(FULLSCREEN);
         if(FULLSCREEN){
             Dimension dimension = new Dimension(WIDTH, HEIGHT);
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
