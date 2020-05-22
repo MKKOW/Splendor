@@ -19,7 +19,8 @@ public class Menu{
         playButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                view.setVisible(false);
+                frame.setContentPane(new Game(frame).view);
             }
         });
         settingsButton.addActionListener(new ActionListener() {

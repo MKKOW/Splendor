@@ -25,8 +25,8 @@ public class Settings {
     public Settings(JFrame frame) {
         Toolkit tk =Toolkit.getDefaultToolkit();
         Dimension screenSize=tk.getScreenSize();
-        ResolutionWidth.setText("Resolutin Width: "+frame.getWidth());
-        ResolutionHeight.setText("Resolution Heigth: "+frame.getHeight());
+        ResolutionWidth.setText("<html><font color='white'>Resolutin Width: " + frame.getWidth()+"</font></html>");
+        ResolutionHeight.setText("<html><font color='white'>Resolutin Width: " + frame.getHeight()+"</font></html>");
         WidthSlider.setMaximum(screenSize.width);
         HeightSlider.setMaximum(screenSize.height);
         WidthSlider.setValue(frame.getWidth());
@@ -66,7 +66,7 @@ public class Settings {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if(!fullscreenCheckBox.isSelected()) {
-                    ResolutionWidth.setText("Resolution Width: " + WidthSlider.getValue());
+                    ResolutionWidth.setText("<html><font color='white'>Resolutin Width: " + WidthSlider.getValue()+"</font></html>");
                 }else{
                     WidthSlider.setValue(screenSize.width);
                 }
@@ -76,7 +76,7 @@ public class Settings {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if(!fullscreenCheckBox.isSelected()) {
-                    ResolutionHeight.setText("Resolution Height: " + HeightSlider.getValue());
+                    ResolutionHeight.setText("<html><font color='white'>Resolutin Height: " + HeightSlider.getValue()+"</font></html>");
                 }else{
                     HeightSlider.setValue(screenSize.height);
                 }
@@ -86,8 +86,8 @@ public class Settings {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(fullscreenCheckBox.isSelected()) {
-                    ResolutionWidth.setText("Resolutin Width: " + screenSize.width);
-                    ResolutionHeight.setText("Resolution Heigth: " + screenSize.height);
+                    ResolutionWidth.setText("<html><font color='white'>Resolutin Width: " + screenSize.width+"</font></html>");
+                    ResolutionHeight.setText("<html><font color='white'>Resolutin Height: " + screenSize.height+"</font></html>");
                     WidthSlider.setValue(screenSize.width);
                     HeightSlider.setValue(screenSize.height);
                 }
