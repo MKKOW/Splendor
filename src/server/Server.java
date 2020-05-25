@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Server {
@@ -38,6 +39,10 @@ public class Server {
         this.serverport = serverport;
         this.playersNumber = playersNumber;
     }
+
+
+
+    public ArrayList<String> playersnicks = new ArrayList<>();
 
     /**
      * Receives message from client
@@ -71,24 +76,7 @@ public class Server {
     /**
      * Part of protocol, sends hello to client and creates its clientID
      */
-    public void sayHello() {
-        JsonFactory factory = new JsonFactory();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
-            JsonGenerator generator = factory.createGenerator(stream, JsonEncoding.UTF8);
-            generator.writeStartObject();
-            generator.writeStringField("answer_type","server_hello");
-            generator.writeStringField("set_client_id",UUID.randomUUID().toString());
-            generator.writeNumberField("number_of_players",playersNumber);
-            generator.writeStringField("server_version",serverVersion);
-            generator.writeEndObject();
-            generator.close();
-            System.out.println(stream.toString());
-            sendClientMessage(stream.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
     public void clientHello(){
         // tymczasowe
         System.out.println("Client: " + getClientMessage());
@@ -100,25 +88,21 @@ public class Server {
     public  void runserver() {
         try {
             ServerSocket socket = new ServerSocket(serverport);
-            Socket clientsocket = socket.accept();
-            System.out.println("Starting Splendor server on port: " + serverport);
-            outputStream = new ObjectOutputStream(clientsocket.getOutputStream());
-            inputStream = new ObjectInputStream(clientsocket.getInputStream());
-            sayHello();
-            clientHello();
-
-            // for tests: create, send and receive object (card)
-            Card karta1 = new Card(1, 1, 1, "test");
-            System.out.println("Wysylam karte: " + karta1);
-            outputStream.writeObject(karta1);
-            karta1 = (Card) inputStream.readObject();
-            System.out.println("Odeslana karta: " + karta1);
-
-            } catch (IOException | ClassNotFoundException e) {
+            for(int i = 0;i<playersNumber;i++) {
+                Socket clientsocket = socket.accept();
+                System.out.println("Starting Splendor server on port: " + serverport);
+                outputStream = new ObjectOutputStream(clientsocket.getOutputStream());
+                inputStream = new ObjectInputStream(clientsocket.getInputStream());
+                Thread thread = new ClientHandler(outputStream,inputStream,clientsocket,playersNumber,this);
+                thread.start();
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
+
             }
 
         }
+
     public static void main(String[] args)  {
         try{
             Server server = new Server(defaultport,3);
