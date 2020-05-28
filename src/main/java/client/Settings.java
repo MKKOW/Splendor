@@ -12,6 +12,7 @@ import java.io.IOException;
  * GUI for the settings section
  */
 public class Settings {
+    public static final String configPath = "src/main/resources/.config";
     private JButton applyButton;
     protected JPanel view;
     private JButton returnButton;
@@ -51,7 +52,7 @@ public class Settings {
                 string += "fullscreen = " + FULLSCREEN+System.lineSeparator();
                 FileWriter fileWriter = null;
                 try {
-                    fileWriter = new FileWriter(".config");
+                    fileWriter = new FileWriter(configPath);
                     fileWriter.write(string);
                     fileWriter.flush();
                     fileWriter.close();

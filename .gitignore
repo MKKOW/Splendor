@@ -1,4 +1,4 @@
 .idea
 out
 *.iml
-.config
+src/main/resources/.config

@@ -19,7 +19,7 @@ public class ClientView extends Canvas{
      */
     public static void ReadConfig() throws IOException {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(".config")));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(Settings.configPath)));
             String[] line = bufferedReader.readLine().split(" ");
             WIDTH = Integer.parseInt(line[2]);
             line = bufferedReader.readLine().split(" ");
@@ -34,7 +34,7 @@ public class ClientView extends Canvas{
             string += "width = " + WIDTH+System.lineSeparator();
             string += "height = " + HEIGHT+System.lineSeparator();
             string += "fullscreen = " + FULLSCREEN+System.lineSeparator();
-            FileWriter fileWriter = new FileWriter(".config");
+            FileWriter fileWriter = new FileWriter(Settings.configPath);
             fileWriter.write(string);
             fileWriter.flush();
             fileWriter.close();
