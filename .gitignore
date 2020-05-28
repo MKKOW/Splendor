@@ -1,6 +1,4 @@
 .idea
 out
-apro2_projekt_splendor.iml
-Projekt.iml
+*.iml
 .config
-pom.xml
