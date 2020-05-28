@@ -79,7 +79,7 @@ public class Game {
             card.setPoints(5);
         }
         LordCards[3].setPoints(3);
-        Dimension dimension=new Dimension(50,75);
+        /*Dimension dimension=new Dimension(50,100);
         BlueDeck.setPreferredSize(dimension);
         BlueDeck.setMaximumSize(dimension);
         BlueDeck.setMinimumSize(dimension);
@@ -93,7 +93,7 @@ public class Game {
             card.setPreferredSize(dimension);
             card.setMaximumSize(dimension);
             card.setMinimumSize(dimension);
-        }
+        }*/
         Menu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
