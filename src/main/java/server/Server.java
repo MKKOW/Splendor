@@ -14,6 +14,9 @@ public class Server {
      * Default server port
      */
     private static final int defaultport = 2000;
+    /**
+     * Chosen server port to run
+     */
     private final int serverport;
     private final String serverVersion = "1.0";
     /**
@@ -24,21 +27,47 @@ public class Server {
      * Data output
      */
     private ObjectOutputStream outputStream;
+    /**
+     * Server's socket
+     */
     private ServerSocket socket ;
+    /**
+     * Client's socket
+     */
     private Socket clientsocket;
     private Thread thread;
+    /**
+     * HashMap storing player's id with their nicknames
+     */
     HashMap<String,String> hashMap = new HashMap<>();
     /**
      * Number of players
      */
     private final int playersNumber;
+    /**
+     * List of players' nicknames
+     */
     ArrayList<String> playersnicks = new ArrayList<>();
+    /**
+     * Instance of game's board
+     */
     public Model.Board board;
     public Card card;
+
+    /**
+     * Server constructor
+     * @param serverport server port to run
+     * @param playersNumber number of players in the game
+     */
     public Server(int serverport,int playersNumber){
         this.serverport = serverport;
         this.playersNumber = playersNumber;
     }
+
+    /**
+     * Closes clients-server connection
+     * @throws IOException
+     */
     public void closeConnection() throws IOException {
         try {
             outputStream.close();
@@ -49,7 +78,7 @@ public class Server {
         }
     }
     /**
-     * Starts server
+     * Starts server and clients' threads
      */
     public  void runserver() throws IOException {
         card = new Card(1,1,1,"test");

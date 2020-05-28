@@ -10,15 +10,45 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class ClientHandler extends  Thread{
+    /**
+     * Data output
+     */
+    final ObjectOutputStream outputStream;
+    /**
+     * Data input
+     */
+    final ObjectInputStream inputStream;
+    /**
+     * Client's socket
+     */
+    final Socket socket;
+    /**
+     * Number of players in the game
+     */
+    final int playernumber;
+    /**
+     * // TODO: change to board
+     */
+    final Card card;
+    /**
+     * HashMap storing player's id with their nicknames
+     */
+    final HashMap<String,String> hashMap;
+    /**
+     * Server in the game
+     */
+    private final Server server;
 
-        final ObjectOutputStream outputStream;
-        final ObjectInputStream inputStream;
-        final Socket socket;
-        final int playernumber;
-        final Card card;
-        final HashMap<String,String> hashMap;
-        private final Server server;
-
+    /**
+     * ClientHandler constructor
+     * @param outputStream data output
+     * @param inputStream data input
+     * @param socket client's socket
+     * @param playernumber number of players in the game
+     * @param server game server
+     * @param card card TODO: change to board
+     * @param hashMap map with nicks and ids
+     */
     public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, int playernumber, Server server, Card card, HashMap<String,String> hashMap) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
@@ -40,6 +70,10 @@ public class ClientHandler extends  Thread{
     }
 
      */
+
+    /**
+     * Sends to client server hello with player's id
+     */
     public void sayHello() {
         try {
             String jsonString = new JSONObject()
@@ -57,6 +91,12 @@ public class ClientHandler extends  Thread{
 
         }
     }
+
+    /**
+     * Verifies player's nickname and sends the result
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private void checkClientnick() throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
@@ -89,6 +129,11 @@ public class ClientHandler extends  Thread{
         server.hashMap.put(jsonObject.getString("set_nick"),jsonObject.getString("client_id"));
         System.out.println(server.playersnicks.toString());
     }
+
+    /**
+     * Starts the game and sends to clients info about the board
+     * @throws IOException
+     */
     private void gameStart() throws IOException {
         String response = new JSONObject()
                     .put("answer_type","game_start")

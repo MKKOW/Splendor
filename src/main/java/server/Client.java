@@ -22,48 +22,74 @@ public class Client {
      */
     // TODO: sposob przydzielania ?
     private final String clientVersion = "1.0";
+    /**
+     * Chosen server port
+     */
     private final int serverPort;
     /**
      * Client unique UUID
      */
     private UUID clientID;
     /**
-     * Input for client socket
+     * Data input
      */
     private ObjectInputStream inputStream;
     /**
-     * Output for client socket
+     * Data output
      */
     private ObjectOutputStream outputStream;
+    /**
+     * List of nicknames
+     */
     private ArrayList<String> nicknames;
-    // Testowe
+    /**
+     * Client's nick
+     */
     private String nick = "";
+
+    /**
+     * Gets client's nickname
+     * @return nick
+     */
     public String getNick () {
         return nick;
     }
 
     /**
      * Sets clientID from given String
-     * @param clientID
+     * @param clientID client ID as String
      */
     public void setClientID(String clientID) {
         this.clientID = UUID.fromString(clientID);
     }
+
+    /**
+     * Getter for client's ID
+     * @return client ID
+     */
     public String getStringID() {
         return clientID.toString();
     }
+
+    /**
+     * Client constructor
+     * @param port server port
+     * @param host server address
+     */
     public Client(int port, String host){
         this.serverPort = port;
         Client.host = host;
     }
     /**
-     * Part of protocol, generates hello to server and chooses player's nick
+     * Sends client hello to server and chooses player's nick
      */
     public void sayHello() throws IOException, ClassNotFoundException {
         System.out.println("Podaj swój nick: ");
         Scanner scn = new Scanner(System.in);
         String tmp = scn.nextLine();
         String input;
+
+        // Local verification on client
         while (!(tmp.length() >= 3 && tmp.length() <= 10)) {
             System.out.println("Nick niedozwolony");
             tmp = scn.nextLine();
@@ -76,6 +102,8 @@ public class Client {
         this.nick = tmp;
         System.out.println("Twój nick to: " +nick);
         //System.out.println(clientID);
+
+        // Sending chosen nickname
         String jsonString = new JSONObject()
                 .put("request_type","client_hello")
                 .put("client_id",getStringID())
@@ -85,14 +113,16 @@ public class Client {
         outputStream.flush();
         input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
+
+        // Verification from server
         while(jsonObject.getString("result").equals("invalid"))
         {
             sayHello();
         }
     }
-    /**
-     * Part of protocol, parses hello answer from server and sets given clientID
 
+    /**
+     * Gets and parses hello answer from server and sets given clientID
      */
     public void getserverHello()  {
         String input;
@@ -111,6 +141,12 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Begins the actual game and sends info about the board
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public void gameStart() throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
@@ -132,7 +168,7 @@ public class Client {
     }
      */
     /**
-     * Starts client
+     * Starts client and connects to server
      */
     public void runClient() {
             try {
