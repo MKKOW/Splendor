@@ -8,14 +8,6 @@ import java.awt.event.MouseMotionAdapter;
 
 public class Card extends JComponent{
     private JPanel Card;
-    private JPanel bonus;
-    private JPanel points;
-    private coinStack costWhite;
-    private coinStack costBlue;
-    private coinStack costGreen;
-    private coinStack costRed;
-    private coinStack costBlack;
-    private JPanel costField;
     private int x;
     private int y;
     private Point initialPoint;
@@ -45,15 +37,6 @@ public class Card extends JComponent{
                 Card.setLocation(Card.getX()+dx,Card.getY()+dy);
             }
         });
-    }
-    public void setCost(int White,int Blue,int Green, int Red,int Black){
-        costWhite.set(White,"black",Color.WHITE);
-        costBlue.set(Blue,"white",Color.BLUE);
-        costGreen.set(Green,"black",Color.GREEN);
-        costRed.set(Red,"black",Color.RED);
-        costBlack.set(Black,"white",Color.BLACK);
-        if(White!=0||Blue!=0||Green!=0||Red!=0||Black!=0)
-            costField.setVisible(true);
     }
 
     @Override
