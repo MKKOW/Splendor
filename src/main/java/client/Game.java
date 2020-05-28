@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class Game {
     protected JPanel view;
@@ -29,7 +30,32 @@ public class Game {
     private Card[] BlueCards;
     private Card[] YellowCards;
     private Card[] GreenCards;
+    private Card[] allCards;
     public Game(JFrame frame) {
+        assign();
+        for (Card card:allCards)
+            card.setPreferredSize(new Dimension(50,75));
+        for(Card card:BlueCards)
+            card.setBackground(Color.BLUE);
+        for(Card card:YellowCards)
+            card.setBackground(Color.YELLOW);
+        for(Card card:GreenCards)
+            card.setBackground(Color.GREEN);
+        for(Card card:BlueCards)
+            card.setCost(0,2,3,1,0);
+        for(Card card:YellowCards)
+            card.setCost(2,3,0,0,0);
+        for(Card card:GreenCards)
+            card.setCost(0,0,0,0,0);
+        Menu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                view.setVisible(false);
+                frame.setContentPane(new Menu(frame).view);
+            }
+        });
+    }
+    private void assign(){
         LordCards=new Card[5];
         LordCards[0]=Lord1Card;
         LordCards[1]=Lord2Card;
@@ -51,19 +77,15 @@ public class Game {
         GreenCards[1]=Green2;
         GreenCards[2]=Green3;
         GreenCards[3]=Green4;
-        for(Card card:BlueCards)
-            card.setBackground(Color.BLUE);
-        for(Card card:YellowCards)
-            card.setBackground(Color.YELLOW);
-        for(Card card:GreenCards)
-            card.setBackground(Color.GREEN);
-        Menu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                view.setVisible(false);
-                frame.setContentPane(new Menu(frame).view);
-            }
-        });
+        allCards=new Card[17];
+        int i=0;
+        for(Card card:LordCards){
+            allCards[i]=card;i++;}
+        for(Card card:BlueCards){
+            allCards[i]=card;i++;}
+        for(Card card:YellowCards){
+            allCards[i]=card;i++;}
+        for(Card card:GreenCards){
+            allCards[i]=card;i++;}
     }
-
 }
