@@ -26,6 +26,16 @@ public class Game {
     private Card Green3;
     private Card Green4;
     private JButton Menu;
+    private Deck BlueDeck;
+    private Deck YellowDeck;
+    private Deck GreenDeck;
+    private coinStack whiteStack;
+    private coinStack blueStack;
+    private coinStack greenStack;
+    private coinStack redStack;
+    private coinStack blackStack;
+    private coinStack goldStack;
+    private JPanel coinField;
     private Card[] LordCards;
     private Card[] BlueCards;
     private Card[] YellowCards;
@@ -33,20 +43,57 @@ public class Game {
     private Card[] allCards;
     public Game(JFrame frame) {
         assign();
-        for (Card card:allCards)
-            card.setPreferredSize(new Dimension(50,75));
+        whiteStack.set(10,"black",Color.WHITE);
+        blueStack.set(10,"white",Color.BLUE);
+        greenStack.set(10,"black",Color.GREEN);
+        redStack.set(10,"black",Color.RED);
+        blackStack.set(10,"white",Color.BLACK);
+        goldStack.set(10,"white",Color.ORANGE);
+        BlueDeck.setBackground(Color.BLUE);
+        YellowDeck.setBackground(Color.YELLOW);
+        GreenDeck.setBackground(Color.GREEN);
+        BlueDeck.set(10,1);
+        YellowDeck.set(20,2);
+        GreenDeck.set(30,3);
+
         for(Card card:BlueCards)
             card.setBackground(Color.BLUE);
         for(Card card:YellowCards)
             card.setBackground(Color.YELLOW);
         for(Card card:GreenCards)
             card.setBackground(Color.GREEN);
-        for(Card card:BlueCards)
-            card.setCost(0,2,3,1,0);
-        for(Card card:YellowCards)
-            card.setCost(2,3,0,0,0);
-        for(Card card:GreenCards)
-            card.setCost(0,0,0,0,0);
+        for(Card card:BlueCards) {
+            card.setCost(0, 2, 3, 1, 0);
+            card.setPoints(0);
+        }
+        for(Card card:YellowCards) {
+            card.setCost(2, 3, 0, 0, 0);
+            card.setPoints(2);
+        }
+        for(Card card:GreenCards) {
+            card.setCost(0, 0, 0, 0, 0);
+            card.setPoints(3);
+        }
+        for(Card card:LordCards){
+            card.setCost(5,5,5,5,5);
+            card.setPoints(5);
+        }
+        LordCards[3].setPoints(3);
+        Dimension dimension=new Dimension(50,75);
+        BlueDeck.setPreferredSize(dimension);
+        BlueDeck.setMaximumSize(dimension);
+        BlueDeck.setMinimumSize(dimension);
+        YellowDeck.setPreferredSize(dimension);
+        YellowDeck.setMaximumSize(dimension);
+        YellowDeck.setMinimumSize(dimension);
+        GreenDeck.setPreferredSize(dimension);
+        GreenDeck.setMaximumSize(dimension);
+        GreenDeck.setMinimumSize(dimension);
+        for (Card card:allCards){
+            card.setPreferredSize(dimension);
+            card.setMaximumSize(dimension);
+            card.setMinimumSize(dimension);
+        }
         Menu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

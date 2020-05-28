@@ -27,8 +27,8 @@ public class ClientView extends Canvas{
             line = bufferedReader.readLine().split(" ");
             FULLSCREEN = Boolean.parseBoolean(line[2]);
         } catch (Exception e) {
-            WIDTH = 400;
-            HEIGHT = 400;
+            WIDTH = 1000;
+            HEIGHT = 1000;
             FULLSCREEN = false;
             String string = "";
             string += "width = " + WIDTH+System.lineSeparator();

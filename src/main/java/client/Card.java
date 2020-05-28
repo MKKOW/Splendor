@@ -8,14 +8,15 @@ import java.awt.event.MouseMotionAdapter;
 
 public class Card extends JComponent{
     private JPanel Card;
-    private JPanel bonus;
-    private JPanel points;
     private coinStack costWhite;
     private coinStack costBlue;
     private coinStack costGreen;
     private coinStack costRed;
     private coinStack costBlack;
     private JPanel costField;
+    private JLabel pointsField;
+    private JPanel bonus;
+    private int points=0;
     private int x;
     private int y;
     private Point initialPoint;
@@ -46,6 +47,13 @@ public class Card extends JComponent{
             }
         });
     }
+    public void setPoints(int points){
+        this.points=points;
+        if(points==0){
+            pointsField.setVisible(false);
+        }
+        pointsField.setText(Integer.toString(points));
+    }
     public void setCost(int White,int Blue,int Green, int Red,int Black){
         costWhite.set(White,"black",Color.WHITE);
         costBlue.set(Blue,"white",Color.BLUE);
@@ -56,6 +64,21 @@ public class Card extends JComponent{
             costField.setVisible(true);
     }
 
+    @Override
+    public void setPreferredSize(Dimension preferredSize) {
+        super.setPreferredSize(preferredSize);
+        Card.setPreferredSize(preferredSize);
+    }
+    @Override
+    public void setMaximumSize(Dimension preferredSize) {
+        super.setMaximumSize(preferredSize);
+        Card.setMaximumSize(preferredSize);
+    }
+    @Override
+    public void setMinimumSize(Dimension preferredSize) {
+        super.setMinimumSize(preferredSize);
+        Card.setMinimumSize(preferredSize);
+    }
     @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
