@@ -60,8 +60,9 @@ public class Card extends JComponent{
         costGreen.set(Green,"black",Color.GREEN);
         costRed.set(Red,"black",Color.RED);
         costBlack.set(Black,"white",Color.BLACK);
-        if(White!=0||Blue!=0||Green!=0||Red!=0||Black!=0)
-            costField.setVisible(true);
+        if(White!=0||Blue!=0||Green!=0||Red!=0||Black!=0) {
+            Card.setVisible(true);
+        }
     }
 
     @Override

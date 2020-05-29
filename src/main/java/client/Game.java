@@ -1,10 +1,20 @@
 package client;
 
+import Model.ClientBoard;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class Game {
     protected JPanel view;
@@ -41,44 +51,22 @@ public class Game {
     private Card[] YellowCards;
     private Card[] GreenCards;
     private Card[] allCards;
-    public Game(JFrame frame) {
+    public Game(JFrame frame, JSONObject board) throws JsonProcessingException {
         assign();
-        whiteStack.set(10,"black",Color.WHITE);
-        blueStack.set(10,"white",Color.BLUE);
-        greenStack.set(10,"black",Color.GREEN);
-        redStack.set(10,"black",Color.RED);
-        blackStack.set(10,"white",Color.BLACK);
-        goldStack.set(10,"white",Color.ORANGE);
+        //visual settings
         BlueDeck.setBackground(Color.BLUE);
         YellowDeck.setBackground(Color.YELLOW);
         GreenDeck.setBackground(Color.GREEN);
-        BlueDeck.set(10,1);
-        YellowDeck.set(20,2);
-        GreenDeck.set(30,3);
-
-        for(Card card:BlueCards)
-            card.setBackground(Color.BLUE);
-        for(Card card:YellowCards)
-            card.setBackground(Color.YELLOW);
-        for(Card card:GreenCards)
-            card.setBackground(Color.GREEN);
         for(Card card:BlueCards) {
-            card.setCost(0, 2, 3, 1, 0);
-            card.setPoints(0);
+            card.setBackground(Color.BLUE);
         }
         for(Card card:YellowCards) {
-            card.setCost(2, 3, 0, 0, 0);
-            card.setPoints(2);
+            card.setBackground(Color.YELLOW);
         }
         for(Card card:GreenCards) {
-            card.setCost(0, 0, 0, 0, 0);
-            card.setPoints(3);
+            card.setBackground(Color.GREEN);
         }
-        for(Card card:LordCards){
-            card.setCost(5,5,5,5,5);
-            card.setPoints(5);
-        }
-        LordCards[3].setPoints(3);
+        loadBoard(board);
         /*Dimension dimension=new Dimension(50,100);
         BlueDeck.setPreferredSize(dimension);
         BlueDeck.setMaximumSize(dimension);
@@ -101,6 +89,52 @@ public class Game {
                 frame.setContentPane(new Menu(frame).view);
             }
         });
+    }
+    private void loadBoard(JSONObject board){
+        //load from json
+        BlueDeck.set(10,1);
+        YellowDeck.set(20,2);
+        GreenDeck.set(30,3);
+
+        whiteStack.set(board.getJSONObject("bankCash").getInt("white"),"black",Color.WHITE);
+        blueStack.set(board.getJSONObject("bankCash").getInt("blue"),"white",Color.BLUE);
+        greenStack.set(board.getJSONObject("bankCash").getInt("green"),"black",Color.GREEN);
+        redStack.set(board.getJSONObject("bankCash").getInt("red"),"black",Color.RED);
+        blackStack.set(board.getJSONObject("bankCash").getInt("black"),"white",Color.BLACK);
+        goldStack.set(board.getJSONObject("bankCash").getInt("yellow"),"white",Color.ORANGE);
+        JSONArray[] CardArray=new JSONArray[3];
+        for(int j=0;j<3;j++){
+            CardArray[j]= board.
+                    getJSONObject("developmentCardsOnBoard").
+                    getJSONArray("level"+(j+1));
+            for(int i=0;i<CardArray[j].length();i++) {
+                Card card=allCards[5+4*j+i];
+                JSONObject jsonCard=CardArray[j].getJSONObject(i);
+                JSONObject cost=jsonCard.
+                        getJSONObject("cost");
+                card.setCost(cost.getInt("white"),
+                        cost.getInt("blue"),
+                        cost.getInt("green"),
+                        cost.getInt("red"),
+                        cost.getInt("black"));
+                card.setPoints(jsonCard.
+                        getInt("prestige"));
+            }
+        }
+        JSONArray nobles=board.getJSONObject("nobles").getJSONArray("nobles");
+        for(int i=0;i<nobles.length();i++){
+            Card card=LordCards[i];
+            JSONObject jsonLord=nobles.getJSONObject(i);
+            JSONObject cost=jsonLord.getJSONObject("cost");
+            card.setCost(cost.getInt("white"),
+                    cost.getInt("blue"),
+                    cost.getInt("green"),
+                    cost.getInt("red"),
+                    cost.getInt("black"));
+            card.setPoints(jsonLord.
+                    getInt("prestige"));
+        }
+        LordCards[3].setPoints(3);
     }
     private void assign(){
         LordCards=new Card[5];

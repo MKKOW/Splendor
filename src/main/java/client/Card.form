@@ -8,6 +8,7 @@
     <properties>
       <background color="-5963264"/>
       <foreground color="-2105856"/>
+      <visible value="false"/>
     </properties>
     <border type="none"/>
     <children>
@@ -55,7 +56,7 @@
         </constraints>
         <properties>
           <background color="-10132638"/>
-          <visible value="false"/>
+          <visible value="true"/>
         </properties>
         <border type="none"/>
         <children>
