@@ -1,15 +1,16 @@
 package Exceptions;
 
 /**
- * Exception thrown when there is no enough cash to subtract from
- * i.e when subtracting cost from cash, cash becomes negative.
+ * Exception thrown when player is ordered to hold
+ * some development card, but he already has one on
+ * his hand.
  */
-public class NotEnoughCashException extends Exception {
+public class TooManyClaimsException extends Exception {
 
     /**
      * Basic exception
      */
-    public NotEnoughCashException() {
+    public TooManyClaimsException() {
     }
 
     /**
@@ -17,7 +18,7 @@ public class NotEnoughCashException extends Exception {
      *
      * @param message - message explaining exception
      */
-    public NotEnoughCashException(String message) {
+    public TooManyClaimsException(String message) {
         super(message);
     }
 
@@ -27,7 +28,7 @@ public class NotEnoughCashException extends Exception {
      * @param message - message explaining exception
      * @param cause   - Exception that caused that exception
      */
-    public NotEnoughCashException(String message, Throwable cause) {
+    public TooManyClaimsException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -36,7 +37,7 @@ public class NotEnoughCashException extends Exception {
      *
      * @param cause - Exception that caused that exception
      */
-    public NotEnoughCashException(Throwable cause) {
+    public TooManyClaimsException(Throwable cause) {
         super(cause);
     }
 
@@ -48,7 +49,7 @@ public class NotEnoughCashException extends Exception {
      * @param enableSuppression  -
      * @param writableStackTrace -
      */
-    public NotEnoughCashException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public TooManyClaimsException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

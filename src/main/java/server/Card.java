@@ -20,7 +20,7 @@ public class Card implements Serializable {
 
     @Override
     public String toString() {
-        return "Card{" +
+        return "DevelopmentCard{" +
                 "blue=" + blue +
                 ", red=" + red +
                 ", green=" + green +

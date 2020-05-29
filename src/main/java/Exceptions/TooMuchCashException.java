@@ -1,15 +1,15 @@
 package Exceptions;
 
 /**
- * Exception thrown when there is no enough cash to subtract from
- * i.e when subtracting cost from cash, cash becomes negative.
+ * Exception thrown when player is given cash, but it overflows
+ * max allowed sum of cash to have.
  */
-public class NotEnoughCashException extends Exception {
+public class TooMuchCashException extends Exception {
 
     /**
      * Basic exception
      */
-    public NotEnoughCashException() {
+    public TooMuchCashException() {
     }
 
     /**
@@ -17,7 +17,7 @@ public class NotEnoughCashException extends Exception {
      *
      * @param message - message explaining exception
      */
-    public NotEnoughCashException(String message) {
+    public TooMuchCashException(String message) {
         super(message);
     }
 
@@ -27,7 +27,7 @@ public class NotEnoughCashException extends Exception {
      * @param message - message explaining exception
      * @param cause   - Exception that caused that exception
      */
-    public NotEnoughCashException(String message, Throwable cause) {
+    public TooMuchCashException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -36,7 +36,7 @@ public class NotEnoughCashException extends Exception {
      *
      * @param cause - Exception that caused that exception
      */
-    public NotEnoughCashException(Throwable cause) {
+    public TooMuchCashException(Throwable cause) {
         super(cause);
     }
 
@@ -48,7 +48,7 @@ public class NotEnoughCashException extends Exception {
      * @param enableSuppression  -
      * @param writableStackTrace -
      */
-    public NotEnoughCashException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public TooMuchCashException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

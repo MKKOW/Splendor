@@ -1,31 +1,25 @@
 package Model;
 
-import Exceptions.IllegalCostException;
+import Exceptions.IllegalCashAmountException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Tests for Cost class")
 class CostTest {
-
     @Test
     @DisplayName("Constructor should throw IllegalArgumentExemption when given negative value in any field")
     void constructorThrow() {
-        assertAll(
-                () -> assertThrows(IllegalCostException.class, () -> new Cost(-7, 12, -3, 4, 1)),
-                () -> assertThrows(IllegalCostException.class, () -> new Cost(1, -7, 0, 0, 4)),
-                () -> assertThrows(IllegalCostException.class, () -> new Cost(0, 12, 9, -2, -4)),
-                () -> assertThrows(IllegalCostException.class, () -> new Cost(-6, -0, 2, 3, 0))
-        );
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> new Cost(-7, 12, -3, 4, 1)), () -> assertThrows(IllegalArgumentException.class, () -> new Cost(1, -7, 0, 0, 4)), () -> assertThrows(IllegalArgumentException.class, () -> new Cost(0, 12, 9, -2, -4)), () -> assertThrows(IllegalArgumentException.class, () -> new Cost(-6, -0, 2, 3, 0)));
     }
 
     @Test
     @DisplayName("add() should add values to corresponding fields")
-    void add1() {
+    void add1() throws IllegalCashAmountException {
         Cost cost0 = new Cost(0, 1, 2, 3, 4);
         Cost cost1 = new Cost(9, 0, 8, 0, 7);
         cost0.add(cost1);
-
         assertEquals(9, cost0.getWhite());
         assertEquals(1, cost0.getGreen());
         assertEquals(10, cost0.getBlue());
@@ -35,7 +29,7 @@ class CostTest {
 
     @Test
     @DisplayName("add() should return object")
-    void add2() {
+    void add2() throws IllegalCashAmountException {
         Cost cost0 = new Cost(0, 1, 2, 3, 4);
         Cost cost1 = new Cost(9, 0, 8, 0, 7);
         assertEquals(new Cost(9, 1, 10, 3, 11), cost0.add(cost1));
@@ -67,3 +61,4 @@ class CostTest {
         assertEquals(x.hashCode(), y.hashCode());
     }
 }
+

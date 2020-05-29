@@ -7,33 +7,13 @@ import java.util.Objects;
 /**
  * Representation of Noble card in the Model
  */
-public class Noble implements Serializable {
+public class Noble extends Card implements Serializable {
 
     /**
      * Serial version for serialization purposes
      */
     protected static final long serialVersionUID = 789L;
 
-    /**
-     * Noble id
-     */
-    private final int id;
-
-    /**
-     * Cost of noble to come to the player
-     */
-    private final Cost cost;
-
-    /**
-     * Prestige noble gives to player
-     */
-    private final int prestige;
-
-
-    /**
-     * Path to image of the noble
-     */
-    private final Path imagePath;
 
     /**
      * All field constructor
@@ -44,27 +24,9 @@ public class Noble implements Serializable {
      * @param imagePath - path to image
      */
     public Noble(int id, Cost cost, int prestige, Path imagePath) {
-        this.id = id;
-        this.cost = cost;
-        this.prestige = prestige;
-        this.imagePath = imagePath;
+        super(id, cost, prestige, imagePath);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public Cost getCost() {
-        return cost;
-    }
-
-    public int getPrestige() {
-        return prestige;
-    }
-
-    public Path getImagePath() {
-        return imagePath;
-    }
 
     /**
      * Check if noble is equal to another.

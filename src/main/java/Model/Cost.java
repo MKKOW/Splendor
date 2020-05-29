@@ -1,6 +1,5 @@
 package Model;
 
-import Exceptions.IllegalCostException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -36,6 +35,7 @@ public class Cost implements Serializable {
      */
     protected int red;
 
+
     /**
      * All parameter constructor
      *
@@ -44,17 +44,28 @@ public class Cost implements Serializable {
      * @param blue  - cost of blue gems
      * @param black - cost of black gems
      * @param red   - cost of red gems
-     * @throws IllegalCostException - thrown then cost is negative
+     * @throws IllegalArgumentException - thrown then cost is negative
      */
-    public Cost(int white, int green, int blue, int black, int red) throws IllegalCostException {
+    public Cost(int white, int green, int blue, int black, int red) throws IllegalArgumentException {
         if (white < 0 || green < 0 || blue < 0 || black < 0 || red < 0) {
-            throw new IllegalCostException("Cost argument cannot be less than 0");
+            throw new IllegalArgumentException("Cost argument cannot be less than 0");
         }
         this.white = white;
         this.green = green;
         this.blue = blue;
         this.black = black;
         this.red = red;
+    }
+
+    /**
+     * Check if there is enough cash to subtract cost from
+     * without using yellow gems
+     *
+     * @param cost - cost to subtract from
+     * @return true if there is, false otherwise
+     */
+    public boolean enough(@NotNull Cost cost) {
+        return white >= cost.white && green >= cost.green && blue >= cost.blue && black >= cost.black;
     }
 
     /**
@@ -99,6 +110,7 @@ public class Cost implements Serializable {
         red += other.red;
         return this;
     }
+
 
     /**
      * Sum of all the gems
@@ -173,6 +185,14 @@ public class Cost implements Serializable {
                 getRed() == cost.getRed();
     }
 
+    public enum GemColor {
+        White,
+        Green,
+        Blue,
+        Black,
+        Red
+    }
+
     /**
      * HashCode
      *
@@ -197,16 +217,5 @@ public class Cost implements Serializable {
                 ", black=" + black +
                 ", red=" + red +
                 '}';
-    }
-
-    /**
-     * Enum for possible gem colors
-     */
-    public enum GemColor {
-        White,
-        Green,
-        Blue,
-        Black,
-        Red
     }
 }

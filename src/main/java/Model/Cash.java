@@ -1,6 +1,6 @@
 package Model;
 
-import Exceptions.IllegalCostException;
+import Exceptions.IllegalCashAmountException;
 import Exceptions.NotEnoughCashException;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * Representation of player or bank cash in the Model.
- * <p>
+ *
  * This class extends Cost adding to it additional yellow
  * (gold) coins that player can use as any other cash token,
  * and bank can serve to players claiming cards.
@@ -16,15 +16,9 @@ import java.util.Objects;
 public class Cash extends Cost {
 
     /**
-     * Max cash that player is allowed to have
-     */
-    public static int MaxPlayerCash = 10;
-
-    /**
      * Number of yellow coins
      */
-    private int yellow;
-
+    protected int yellow;
 
     /**
      * All parameter constructor
@@ -35,32 +29,33 @@ public class Cash extends Cost {
      * @param black  - number of black gems
      * @param red    - number of red gems
      * @param yellow - number of yellow gems
-     * @throws IllegalCostException - thrown when one or more arguments is negative
+     * @throws IllegalArgumentException - thrown when one or more arguments is negative
      */
-    public Cash(int white, int green, int blue, int black, int red, int yellow) throws IllegalCostException {
+    public Cash(int white, int green, int blue, int black, int red, int yellow) throws IllegalArgumentException {
         super(white, green, blue, black, red);
-        if (yellow < 0) throw new IllegalCostException("Yellow tokens cannot negative");
+        if (yellow < 0) throw new IllegalArgumentException("Yellow tokens cannot be negative");
         this.yellow = yellow;
     }
 
     /**
-     * Get maximal number of cash player can have
+     * check if given cash amount is allowed to add to players
      *
-     * @return max number of cash player can have
+     * @param cost - cost to add
      */
-    public static int getMaxPlayerCash() {
-        return MaxPlayerCash;
+    private static void checkAllowedCashAmount(Cost cost) throws IllegalCashAmountException {
+        // TODO: do this
     }
 
     /**
-     * Add cash to this cash
+     * Check if cash is allowed to be added, then add that cash
      *
-     * @param other - cash to add
+     * @param cash - cash to add
      * @return this for further chaining
      */
-    public Cash add(Cash other) {
-        super.add(other);
-        yellow += other.yellow;
+    public Cash add(Cash cash) throws IllegalCashAmountException {
+        checkAllowedCashAmount(cash);
+        super.add(cash);
+        yellow += cash.yellow;
         return this;
     }
 
@@ -68,19 +63,17 @@ public class Cash extends Cost {
      * Subtract cost from this cash without using yellow gems
      *
      * @param cost - cost to subtract
-     * @return this for further chaining
      * @throws NotEnoughCashException - thrown when there is not enough cash to subtract from
      */
-    public Cash sub(Cost cost) throws NotEnoughCashException {
+    public void sub(Cost cost) throws NotEnoughCashException {
         if (!enough(cost)) {
-            throw new NotEnoughCashException("Too little cash to subtract from.");
+            throw new NotEnoughCashException(this + " isn't enough to sub from (excluding yellow)" + cost);
         }
         white -= cost.white;
         green -= cost.green;
         blue -= cost.blue;
         black -= cost.black;
         red -= cost.red;
-        return this;
     }
 
     /**
@@ -88,13 +81,12 @@ public class Cash extends Cost {
      *
      * @param cost      - cost to subtract from
      * @param maxYellow - max number of yellow coins to use
-     * @return this for further chaining
-     * @throws IllegalCostException   - thrown when number of maxYellow to use is bigger than owned yellow coins
-     * @throws NotEnoughCashException - thrown when there is not enough cash to subtract from
+     * @throws IllegalArgumentException - thrown when number of maxYellow to use is bigger than owned yellow coins
+     * @throws NotEnoughCashException   - thrown when there is not enough cash to subtract from
      */
-    public Cash sub(Cost cost, int maxYellow) throws IllegalCostException, NotEnoughCashException {
+    public Cash sub(Cost cost, int maxYellow) throws IllegalArgumentException, NotEnoughCashException {
         if (!enough(cost, maxYellow)) {
-            throw new NotEnoughCashException("");
+            throw new NotEnoughCashException(this + " isn't enough to sub from (including yellow)" + cost);
         }
         white -= cost.white;
         if (white < 0) {
@@ -151,6 +143,9 @@ public class Cash extends Cost {
      * @throws IllegalArgumentException - thrown when number of maxYellow to use is bigger than owned yellow coins
      */
     public boolean enough(Cost cost, int maxYellow) throws IllegalArgumentException {
+        if (maxYellow < 0) {
+            throw new IllegalArgumentException("maxYellow cannot be negative");
+        }
         if (maxYellow > this.yellow) {
             throw new IllegalArgumentException("Not enough yellow tokens.");
         }

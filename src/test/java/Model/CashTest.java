@@ -1,6 +1,6 @@
 package Model;
 
-import Exceptions.IllegalCostException;
+import Exceptions.IllegalCashAmountException;
 import Exceptions.NotEnoughCashException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,25 +10,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Tests for Cash class")
 class CashTest extends CostTest {
-
     @Test
-    @DisplayName("Constructor should throw IllegalCashException when given negative value in any field")
+    @DisplayName("Constructor should throw IllegalArgument when given negative value in any field")
     void constructorThrow() {
-        assertAll(
-                () -> assertThrows(IllegalCostException.class, () -> new Cash(-7, 12, -3, 4, 1, 2)),
-                () -> assertThrows(IllegalCostException.class, () -> new Cash(1, -7, 0, 0, 4, 0)),
-                () -> assertThrows(IllegalCostException.class, () -> new Cash(0, 12, 9, -2, -4, 1)),
-                () -> assertThrows(IllegalCostException.class, () -> new Cash(-6, -0, 2, 3, 0, 6))
-        );
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> new Cash(-7, 12, -3, 4, 1, 2)), () -> assertThrows(IllegalArgumentException.class, () -> new Cash(1, -7, 0, 0, 4, 0)), () -> assertThrows(IllegalArgumentException.class, () -> new Cash(0, 12, 9, -2, -4, 1)), () -> assertThrows(IllegalArgumentException.class, () -> new Cash(-6, -0, 2, 3, 0, 6)));
     }
 
     @Test
     @DisplayName("add() should add values to corresponding fields")
-    void add1() {
+    void add1() throws IllegalCashAmountException {
         Cash cash1 = new Cash(0, 1, 2, 3, 4, 0);
         Cash cash2 = new Cash(9, 0, 8, 0, 7, 1);
         cash1.add(cash2);
-
         assertEquals(9, cash1.getWhite());
         assertEquals(1, cash1.getGreen());
         assertEquals(10, cash1.getBlue());
@@ -39,7 +32,7 @@ class CashTest extends CostTest {
 
     @Test
     @DisplayName("add() should return Cash object")
-    void add2() {
+    void add2() throws IllegalCashAmountException {
         Cash cash1 = new Cash(0, 1, 2, 3, 4, 1);
         Cash cash2 = new Cash(9, 0, 8, 0, 7, 2);
         assertEquals(new Cash(9, 1, 10, 3, 11, 3), cash1.add(cash2));
@@ -89,7 +82,7 @@ class CashTest extends CostTest {
 
     @Test
     @DisplayName("sub with yellow should return Cash object")
-    void sub8() {
+    void sub8() throws IllegalCashAmountException {
         Cash cash1 = new Cash(0, 1, 2, 3, 4, 1);
         Cash cash2 = new Cash(9, 0, 8, 0, 7, 2);
         assertEquals(new Cash(9, 1, 10, 3, 11, 3), cash1.add(cash2));
@@ -130,3 +123,4 @@ class CashTest extends CostTest {
         }
     }
 }
+
