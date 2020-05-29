@@ -1,11 +1,21 @@
 package server;
 
+import Model.BankCash;
+import Model.ClientBoard;
+import Model.Noble;
+import Model.NoblesOnBoard;
+import client.Card;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Client {
@@ -47,6 +57,8 @@ public class Client {
      */
     private String nick = "";
 
+    private ClientBoard board;
+
     /**
      * Gets client's nickname
      * @return nick
@@ -80,10 +92,7 @@ public class Client {
         this.serverPort = port;
         Client.host = host;
     }
-    /**
-     * Sends client hello to server and chooses player's nick
-     */
-    public void sayHello() throws IOException, ClassNotFoundException {
+    private String chooseNick() {
         System.out.println("Podaj swój nick: ");
         Scanner scn = new Scanner(System.in);
         String tmp = scn.nextLine();
@@ -94,33 +103,45 @@ public class Client {
             System.out.println("Nick niedozwolony");
             tmp = scn.nextLine();
         }
-        while(nicknames.contains(tmp)){
-            System.out.println("Nick zajęty,podaj nowy:  ");
-            tmp = scn.nextLine();
-        }
-        System.out.println(tmp);
         this.nick = tmp;
-        System.out.println("Twój nick to: " +nick);
+        return tmp;
+    }
+    /**
+     * Sends client hello to server and chooses player's nick
+     */
+    public void sayHello() throws IOException, ClassNotFoundException {
+        String input="";
+        JSONObject jsonObject=new JSONObject();
+        chooseNick();
+        System.out.println("Twój nick to: " + nick);
         //System.out.println(clientID);
 
         // Sending chosen nickname
+        jsonObject = sendAndGetNick(input,jsonObject);
+
+        // Verification from server
+        while (jsonObject.getString("result").equals("invalid")) {
+            System.out.println(jsonObject.getString("message"));
+            chooseNick();
+            jsonObject = sendAndGetNick(input,jsonObject);
+        }
+        if (jsonObject.getString("result").equals("ok"))
+            System.out.println("wyjscie");
+    }
+
+    private JSONObject sendAndGetNick(String input, JSONObject jsonObject) throws IOException, ClassNotFoundException {
         String jsonString = new JSONObject()
-                .put("request_type","client_hello")
-                .put("client_id",getStringID())
-                .put("set_nick",getNick())
+                .put("request_type", "client_hello")
+                .put("client_id", getStringID())
+                .put("set_nick", getNick())
                 .toString();
         outputStream.writeObject(jsonString);
         outputStream.flush();
         input = (String) inputStream.readObject();
-        JSONObject jsonObject = new JSONObject(input);
+        jsonObject = new JSONObject(input);
+        return jsonObject;
 
-        // Verification from server
-        while(jsonObject.getString("result").equals("invalid"))
-        {
-            sayHello();
-        }
     }
-
     /**
      * Gets and parses hello answer from server and sets given clientID
      */
@@ -152,8 +173,64 @@ public class Client {
         JSONObject jsonObject = new JSONObject(input);
         nicknames = new ArrayList<>(Arrays.asList(jsonObject.getString("nicknames").replaceAll("(^\\[|\\]$)", "").split(", ")));
         System.out.println(nicknames.toString());
+       // System.out.println(jsonObject.getString("Board"));
+
+        String boardString = jsonObject.getString("Board");
+        System.out.println(boardString);
+        JSONObject boardJSON = new JSONObject(boardString);
+        board.setBankCash(new BankCash(boardJSON.getJSONObject("bankCash").getInt("white"),
+                                       boardJSON.getJSONObject("bankCash").getInt("green"),
+                                       boardJSON.getJSONObject("bankCash").getInt("blue"),
+                                       boardJSON.getJSONObject("bankCash").getInt("black"),
+                                       boardJSON.getJSONObject("bankCash").getInt("red"),
+                                       boardJSON.getJSONObject("bankCash").getInt("yellow")));
+        JSONArray nobles = boardJSON.getJSONObject("nobles").getJSONArray("nobles");
+        Noble[] noblesArr = new Noble[nobles.length()];
+        for(int i=0; i<nobles.length(); i++) {
+            JSONObject jsonLord=nobles.getJSONObject(i);
+            JSONObject costJSON=jsonLord.getJSONObject("cost");
+            Model.Cost cost = new Model.Cost(costJSON.getInt("white"),
+                                             costJSON.getInt("green"),
+                                             costJSON.getInt("blue"),
+                                             costJSON.getInt("black"),
+                                             costJSON.getInt("red"));
+            Model.Noble noble = new Model.Noble(jsonLord.getJSONObject("noble").getInt("id"),
+                    cost,
+                    jsonLord.getJSONObject("noble").getInt("prestige"),
+                    Paths.get(jsonLord.getJSONObject("noble").getString("imagePath")));
+            noblesArr[i] = noble;
+        }
+        board.setNobles(new NoblesOnBoard(noblesArr));
+
+        /*ObjectMapper m = new ObjectMapper();
         System.out.println(jsonObject.getString("Board"));
+
+        board = m.readValue(boardJSON.toString(), Model.ClientBoard.class);
+        System.out.println(board.toString());*/
+        //board = new Model.ClientBoard();
+        //board.setBankCash(new BankCash(jsonObject.getInt()));
+
     }
+
+  /*  public void play () {
+        String response;
+        switch(move) {
+            case 0: {
+                response = new JSONObject()
+                        .put("request_type","buy_card")
+                        .put("client_id",getStringID())
+                        .put("place",board.toString())
+                        .toString();
+
+                          "hand" || "table",
+                        "card_id" : int,
+                "noble_id" : int || null
+
+            }
+        }
+        System.out.println("Koncze ture " + Server.turn);
+        increment();
+    }*/
 
     /**
      * 4 steps connection to server: sending and receiving hello, verifying nick, starting game
@@ -184,7 +261,8 @@ public class Client {
                     // for tests: receive, modify and send object (card)
                 }
             } catch (IOException | ClassNotFoundException ex) {
-                System.out.println("Dziękujemy za grę ^^");
+                //System.out.println("Dziękujemy za grę ^^");
+                ex.printStackTrace();
             }
         }
 
