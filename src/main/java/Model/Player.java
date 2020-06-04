@@ -11,16 +11,16 @@ import java.util.Objects;
  */
 public class Player implements Serializable {
 
+    /**
+     * Serial version for serialization purposes
+     */
+    protected static final long serialVersionUID = 789L;
 
     /**
      * Player's nick
      */
     private final String nick;
 
-    /**
-     * Serial version for serialization purposes
-     */
-    protected static final long serialVersionUID = 789L;
     /**
      * Hashmap of cards owned by player
      */
@@ -64,16 +64,15 @@ public class Player implements Serializable {
     /**
      * Game start constructor
      *
-     * @param active       - indicator if player is currently active
-     * @param nick         - nick of the player
-     * @param startingCash - player's starting cash
+     * @param active - indicator if player is currently active
+     * @param nick   - nick of the player
      */
-    public Player(boolean active, String nick, Cash startingCash) {
+    public Player(boolean active, String nick) {
         this.active = active;
         this.nick = nick;
         this.developmentCards = new HashMap<>();
         this.nobles = new HashMap<>();
-        this.cash = startingCash;
+        this.cash = new Cash(0, 0, 0, 0, 0, 0);
         this.claimedCard = null;
     }
 

@@ -57,6 +57,14 @@ public class Cost implements Serializable {
         this.red = red;
     }
 
+    public Cost() {
+        this.white = 0;
+        this.green = 0;
+        this.blue = 0;
+        this.black = 0;
+        this.red = 0;
+    }
+
     /**
      * Check if there is enough cash to subtract cost from
      * without using yellow gems

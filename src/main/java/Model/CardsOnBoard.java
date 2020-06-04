@@ -11,6 +11,11 @@ import java.util.Arrays;
 public class CardsOnBoard {
 
     /**
+     * Serial version for serialization purposes
+     */
+    protected static final long serialVersionUID = 789L;
+
+    /**
      * First level development cards on board
      */
     DevelopmentCard[] level1;
@@ -38,13 +43,15 @@ public class CardsOnBoard {
         this.level3 = level3;
     }
 
+
     /**
-     * Default constructor - initialize empty arrays
+     * Basic constructor for empty board.
+     * All fields all null.
      */
     public CardsOnBoard() {
-        this.level1 = new DevelopmentCard[Rules.startingNumberOfCardsByLevel];
-        this.level2 = new DevelopmentCard[Rules.startingNumberOfCardsByLevel];
-        this.level3 = new DevelopmentCard[Rules.startingNumberOfCardsByLevel];
+        this.level1 = new DevelopmentCard[Rules.numberOfDevelopmentCardsByLevel];
+        this.level2 = new DevelopmentCard[Rules.numberOfDevelopmentCardsByLevel];
+        this.level3 = new DevelopmentCard[Rules.numberOfDevelopmentCardsByLevel];
     }
 
     /**
@@ -135,8 +142,12 @@ public class CardsOnBoard {
 
 
     /**
-     * @param o
-     * @return
+     * Check if object if equal to that board of cards.
+     * Objects are equal when corresponding arrays have
+     * equal cards (checked by id) on equal indexes
+     *
+     * @param o - object to check
+     * @return true if equals, false otherwise
      */
     @Override
     public boolean equals(Object o) {
