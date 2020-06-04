@@ -4,8 +4,19 @@ import Exceptions.IllegalCashAmountException;
 import Exceptions.TooMuchCashException;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Representation of cash in a bank in a Model
+ */
 public class BankCash extends Cost {
 
+    /**
+     * Serial version for serialization purposes
+     */
+    protected static final long serialVersionUID = 789L;
+
+    /**
+     * Number of yellow (gold) coins
+     */
     private int yellow;
 
     /**
@@ -40,6 +51,21 @@ public class BankCash extends Cost {
         }
     }
 
+    // TODO: do this, only placeholder
+    public void sub(Cash cash) {
+        white -= cash.white;
+        green -= cash.green;
+        blue -= cash.blue;
+        black -= cash.black;
+        red -= cash.red;
+        yellow -= cash.yellow;
+    }
+
+    /**
+     * Get yellow coins
+     *
+     * @return integer number  of yellow coins
+     */
     public int getYellow() {
         return yellow;
     }
@@ -59,15 +85,5 @@ public class BankCash extends Cost {
                 ", red=" + red +
                 ", yellow=" + yellow +
                 '}';
-    }
-
-    // TODO: do this, only placeholder
-    public void sub(Cash cash) {
-        white -= cash.white;
-        green -= cash.green;
-        blue -= cash.blue;
-        black -= cash.black;
-        red -= cash.red;
-        yellow -= cash.yellow;
     }
 }

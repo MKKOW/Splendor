@@ -1,6 +1,5 @@
 package Model;
 
-import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -24,23 +23,16 @@ public abstract class Card {
     protected final int prestige;
 
     /**
-     * Path to source image of that card
-     */
-    protected final Path imagePath;
-
-    /**
      * All parameter constructor
      *
-     * @param id        - id of the card
-     * @param cost      - cost of the card
-     * @param prestige  - prestige of the card
-     * @param imagePath - path to image of the card
+     * @param id       - id of the card
+     * @param cost     - cost of the card
+     * @param prestige - prestige of the card
      */
-    public Card(int id, Cost cost, int prestige, Path imagePath) {
+    public Card(int id, Cost cost, int prestige) {
         this.id = id;
         this.cost = cost;
         this.prestige = prestige;
-        this.imagePath = imagePath;
     }
 
     /**
@@ -70,14 +62,6 @@ public abstract class Card {
         return prestige;
     }
 
-    /**
-     * Get path to image of a card
-     *
-     * @return path to image of a card
-     */
-    public Path getImagePath() {
-        return imagePath;
-    }
 
     /**
      * Check if another card is equals to card

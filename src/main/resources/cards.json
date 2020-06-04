@@ -7,8 +7,7 @@
     "Red": 1,
     "Green": 1,
     "Blue": 1,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -18,8 +17,7 @@
     "Red": 1,
     "Green": 1,
     "Blue": 2,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -29,8 +27,7 @@
     "Red": 1,
     "Green": 0,
     "Blue": 2,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -40,8 +37,7 @@
     "Red": 3,
     "Green": 1,
     "Blue": 0,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Black",
@@ -51,8 +47,7 @@
     "Red": 1,
     "Green": 2,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -62,8 +57,7 @@
     "Red": 0,
     "Green": 2,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -73,8 +67,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -84,8 +77,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 4,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -95,8 +87,7 @@
     "Red": 1,
     "Green": 1,
     "Blue": 0,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Blue",
@@ -106,8 +97,7 @@
     "Red": 2,
     "Green": 1,
     "Blue": 0,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Blue",
@@ -117,8 +107,7 @@
     "Red": 2,
     "Green": 2,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -128,8 +117,7 @@
     "Red": 1,
     "Green": 3,
     "Blue": 1,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -139,8 +127,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Blue",
@@ -150,8 +137,7 @@
     "Red": 0,
     "Green": 2,
     "Blue": 0,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Blue",
@@ -161,8 +147,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Blue",
@@ -172,8 +157,7 @@
     "Red": 4,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "White",
@@ -183,8 +167,7 @@
     "Red": 1,
     "Green": 1,
     "Blue": 1,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "White",
@@ -194,8 +177,7 @@
     "Red": 1,
     "Green": 2,
     "Blue": 1,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "White",
@@ -205,8 +187,7 @@
     "Red": 0,
     "Green": 2,
     "Blue": 2,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "White",
@@ -216,8 +197,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 1,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "White",
@@ -227,8 +207,7 @@
     "Red": 2,
     "Green": 0,
     "Blue": 0,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "White",
@@ -238,8 +217,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 2,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "White",
@@ -249,8 +227,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "White",
@@ -260,8 +237,7 @@
     "Red": 0,
     "Green": 4,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -271,8 +247,7 @@
     "Red": 1,
     "Green": 0,
     "Blue": 1,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Green",
@@ -282,8 +257,7 @@
     "Red": 1,
     "Green": 0,
     "Blue": 1,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Green",
@@ -293,8 +267,7 @@
     "Red": 2,
     "Green": 0,
     "Blue": 1,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Green",
@@ -304,8 +277,7 @@
     "Red": 0,
     "Green": 1,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -315,8 +287,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 1,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -326,8 +297,7 @@
     "Red": 2,
     "Green": 0,
     "Blue": 2,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -337,8 +307,7 @@
     "Red": 3,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -348,8 +317,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 4,
-    "ImageFile": ""
+    "Black": 4
   },
   {
     "Color": "Red",
@@ -359,8 +327,7 @@
     "Red": 0,
     "Green": 1,
     "Blue": 1,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Red",
@@ -370,8 +337,7 @@
     "Red": 0,
     "Green": 1,
     "Blue": 1,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Red",
@@ -381,8 +347,7 @@
     "Red": 0,
     "Green": 1,
     "Blue": 0,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Red",
@@ -392,8 +357,7 @@
     "Red": 1,
     "Green": 0,
     "Blue": 0,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Red",
@@ -403,8 +367,7 @@
     "Red": 0,
     "Green": 1,
     "Blue": 2,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -414,8 +377,7 @@
     "Red": 2,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -425,8 +387,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -436,8 +397,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -447,8 +407,7 @@
     "Red": 0,
     "Green": 2,
     "Blue": 2,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -458,8 +417,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 0,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Black",
@@ -469,8 +427,7 @@
     "Red": 2,
     "Green": 4,
     "Blue": 1,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -480,8 +437,7 @@
     "Red": 3,
     "Green": 5,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -491,8 +447,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -502,8 +457,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 6,
-    "ImageFile": ""
+    "Black": 6
   },
   {
     "Color": "Blue",
@@ -513,8 +467,7 @@
     "Red": 3,
     "Green": 2,
     "Blue": 2,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -524,8 +477,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 2,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Blue",
@@ -535,8 +487,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -546,8 +497,7 @@
     "Red": 1,
     "Green": 0,
     "Blue": 4,
-    "Black": 4,
-    "ImageFile": ""
+    "Black": 4
   },
   {
     "Color": "Blue",
@@ -557,8 +507,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 5,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -568,8 +517,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 6,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "White",
@@ -579,8 +527,7 @@
     "Red": 2,
     "Green": 3,
     "Blue": 0,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "White",
@@ -590,8 +537,7 @@
     "Red": 3,
     "Green": 0,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "White",
@@ -601,8 +547,7 @@
     "Red": 4,
     "Green": 1,
     "Blue": 0,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "White",
@@ -612,8 +557,7 @@
     "Red": 5,
     "Green": 0,
     "Blue": 0,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "White",
@@ -623,8 +567,7 @@
     "Red": 5,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "White",
@@ -634,8 +577,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -645,8 +587,7 @@
     "Red": 3,
     "Green": 2,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -656,8 +597,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 3,
-    "Black": 2,
-    "ImageFile": ""
+    "Black": 2
   },
   {
     "Color": "Green",
@@ -667,8 +607,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 2,
-    "Black": 1,
-    "ImageFile": ""
+    "Black": 1
   },
   {
     "Color": "Green",
@@ -678,8 +617,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 5,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -689,8 +627,7 @@
     "Red": 0,
     "Green": 5,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -700,8 +637,7 @@
     "Red": 0,
     "Green": 6,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -711,8 +647,7 @@
     "Red": 2,
     "Green": 0,
     "Blue": 0,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Red",
@@ -722,8 +657,7 @@
     "Red": 2,
     "Green": 0,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Red",
@@ -733,8 +667,7 @@
     "Red": 0,
     "Green": 2,
     "Blue": 4,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -744,8 +677,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 5,
-    "ImageFile": ""
+    "Black": 5
   },
   {
     "Color": "Red",
@@ -755,8 +687,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 5,
-    "ImageFile": ""
+    "Black": 5
   },
   {
     "Color": "Red",
@@ -766,8 +697,7 @@
     "Red": 6,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -777,8 +707,7 @@
     "Red": 3,
     "Green": 5,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -788,8 +717,7 @@
     "Red": 7,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Black",
@@ -799,8 +727,7 @@
     "Red": 6,
     "Green": 3,
     "Blue": 0,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Black",
@@ -810,8 +737,7 @@
     "Red": 7,
     "Green": 0,
     "Blue": 0,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Blue",
@@ -821,8 +747,7 @@
     "Red": 3,
     "Green": 3,
     "Blue": 0,
-    "Black": 5,
-    "ImageFile": ""
+    "Black": 5
   },
   {
     "Color": "Blue",
@@ -832,8 +757,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Blue",
@@ -843,8 +767,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Blue",
@@ -854,8 +777,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "White",
@@ -865,8 +787,7 @@
     "Red": 5,
     "Green": 3,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "White",
@@ -876,8 +797,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 7,
-    "ImageFile": ""
+    "Black": 7
   },
   {
     "Color": "White",
@@ -887,8 +807,7 @@
     "Red": 3,
     "Green": 0,
     "Blue": 0,
-    "Black": 6,
-    "ImageFile": ""
+    "Black": 6
   },
   {
     "Color": "White",
@@ -898,8 +817,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 7,
-    "ImageFile": ""
+    "Black": 7
   },
   {
     "Color": "Green",
@@ -909,8 +827,7 @@
     "Red": 3,
     "Green": 0,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Green",
@@ -920,8 +837,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 7,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -931,8 +847,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 6,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Green",
@@ -942,8 +857,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 7,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -953,8 +867,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 5,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Color": "Red",
@@ -964,8 +877,7 @@
     "Red": 0,
     "Green": 7,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -975,8 +887,7 @@
     "Red": 3,
     "Green": 6,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Color": "Red",
@@ -986,7 +897,6 @@
     "Red": 3,
     "Green": 7,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   }
 ]
