@@ -140,6 +140,7 @@ public class ClientHandler extends  Thread{
      * @throws IOException
      */
     private void gameStart() throws IOException {
+
         ObjectMapper mapper=new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         String jsonBoard =mapper.writeValueAsString(board);
@@ -148,6 +149,8 @@ public class ClientHandler extends  Thread{
                     .put("nicknames",server.playersnicks.toString())
                     .put("Board",jsonBoard)
                     .toString();
+
+
         outputStream.writeObject(response);
         outputStream.flush();
     }
@@ -177,6 +180,8 @@ public class ClientHandler extends  Thread{
                     }
                 }
                 gameStart();
+                //verifymove();
+
 
                 Thread.sleep(100000000);
             }

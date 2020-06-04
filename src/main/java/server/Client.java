@@ -1,19 +1,20 @@
 package server;
 
-import Model.BankCash;
-import Model.ClientBoard;
-import Model.Noble;
-import Model.NoblesOnBoard;
+import Exceptions.InactivePlayersException;
+import Model.*;
 import client.Card;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graalvm.compiler.replacements.SnippetLowerableMemoryNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.management.PlatformLoggingMXBean;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -126,7 +127,7 @@ public class Client {
             jsonObject = sendAndGetNick(input,jsonObject);
         }
         if (jsonObject.getString("result").equals("ok"))
-            System.out.println("wyjscie");
+            System.out.println("dobre");
     }
 
     private JSONObject sendAndGetNick(String input, JSONObject jsonObject) throws IOException, ClassNotFoundException {
@@ -168,7 +169,8 @@ public class Client {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void gameStart() throws IOException, ClassNotFoundException {
+    public void gameStart() throws IOException, ClassNotFoundException, InactivePlayersException {
+        board = new Model.ClientBoard();
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
         nicknames = new ArrayList<>(Arrays.asList(jsonObject.getString("nicknames").replaceAll("(^\\[|\\]$)", "").split(", ")));
@@ -194,22 +196,22 @@ public class Client {
                                              costJSON.getInt("blue"),
                                              costJSON.getInt("black"),
                                              costJSON.getInt("red"));
-            Model.Noble noble = new Model.Noble(jsonLord.getJSONObject("noble").getInt("id"),
+            Model.Noble noble = new Model.Noble(jsonLord.getInt("id"),
                     cost,
-                    jsonLord.getJSONObject("noble").getInt("prestige"),
-                    Paths.get(jsonLord.getJSONObject("noble").getString("imagePath")));
+                    jsonLord.getInt("prestige"),
+                    Paths.get(URI.create(jsonLord.getString("imagePath"))));
             noblesArr[i] = noble;
         }
+
         board.setNobles(new NoblesOnBoard(noblesArr));
+        HashMap<String,Player> players = new HashMap<>();
+        for(int i=0;i<nicknames.size();i++){
+            Player player = new Player(false,nicknames.get(i),new Model.Cash(0,0,0,0,0,0));
+            players.put(player.getNick(),player);
+            )
 
-        /*ObjectMapper m = new ObjectMapper();
-        System.out.println(jsonObject.getString("Board"));
-
-        board = m.readValue(boardJSON.toString(), Model.ClientBoard.class);
-        System.out.println(board.toString());*/
-        //board = new Model.ClientBoard();
-        //board.setBankCash(new BankCash(jsonObject.getInt()));
-
+        }
+        board.setPlayers(new HashMap<String, Player>());
     }
 
   /*  public void play () {
@@ -244,6 +246,155 @@ public class Client {
         //startGame();
     }
      */
+    private void buycard() throws IOException {
+        String place;
+        int id;
+        Scanner scn = new Scanner(System.in);
+        System.out.println("opcje karty");
+        place = scn.next();
+        id = scn.nextInt();
+        while(!(place.equals("hand")||place.equals("table"))||!(0<id&&id<90)) {
+            System.out.println("Bład");
+            place = scn.next();
+            id = scn.nextInt();
+        }
+        String jsonString = new JSONObject()
+                .put("request_type", "buy_card")
+                .put("client_id", getStringID())
+                .put("place", place)
+                .put("card_id", id)
+                .toString();
+        System.out.println(jsonString);
+        outputStream.writeObject(jsonString);
+        outputStream.flush();
+        scn.close();
+    }
+    private void reservecard() throws IOException {
+        int id;
+        Scanner scn = new Scanner(System.in);
+        System.out.println("opcje rezerwacja");
+        id = scn.nextInt();
+        while(!(0<id&&id<90)) {
+            System.out.println("Bład");
+            id = scn.nextInt();
+        }
+        String jsonString = new JSONObject()
+                .put("request_type", "claim_card")
+                .put("client_id", getStringID())
+                .put("card_id", id)
+                .toString();
+        System.out.println(jsonString);
+        outputStream.writeObject(jsonString);
+        outputStream.flush();
+        scn.close();
+    }
+    private void getgems() throws IOException {
+        int move;
+        int[] gems = new int[5];
+        int sum = 0;
+
+        Scanner scn = new Scanner(System.in);
+        System.out.println("opcje klejnoty");
+        move = scn.nextInt();
+        switch (move) {
+            case 1: {
+                while(sum!=4) {
+                    sum = 0;
+                    System.out.println("asfjsidf");
+                    for (int i = 0; i < gems.length; i++) {
+                        gems[i] = scn.nextInt();
+                        while (gems[i] != 2 && gems[i] != 0) {
+                            System.out.println("Bład");
+                            gems[i] = scn.nextInt();
+                        }
+                        sum = sum + gems[i];
+                    }
+                }
+                String jsonString = new JSONObject()
+                        .put("request_type", "claim_card")
+                        .put("client_id", getStringID())
+                        .put("white", gems[0])
+                        .put("green", gems[1])
+                        .put("blue", gems[2])
+                        .put("black", gems[3])
+                        .put("red", gems[4])
+                        .toString();
+                System.out.println(jsonString);
+                outputStream.writeObject(jsonString);
+                outputStream.flush();
+                break;
+            }
+
+
+
+            case 2:{
+                while(sum!=3) {
+                    sum =0;
+                    System.out.println("asfjsidf");
+                    for (int i = 0; i < gems.length; i++) {
+                        gems[i] = scn.nextInt();
+                        while (gems[i] != 1 && gems[i] != 0) {
+                            System.out.println("Bład");
+                            gems[i] = scn.nextInt();
+                        }
+                        sum = sum + gems[i];
+                    }
+                }
+                String jsonString = new JSONObject()
+                        .put("request_type", "claim_card")
+                        .put("client_id", getStringID())
+                        .put("white", gems[0])
+                        .put("green", gems[1])
+                        .put("blue", gems[2])
+                        .put("black", gems[3])
+                        .put("red", gems[4])
+                        .toString();
+                System.out.println(jsonString);
+                outputStream.writeObject(jsonString);
+                outputStream.flush();
+                break;
+
+            }
+            default:
+                System.out.println("cos");
+                break;
+        }
+        scn.close();
+
+    }
+
+    private void playermove() throws IOException {
+        boolean player = true;
+        while(player){
+        int move;
+        System.out.println("Ruchy");
+        Scanner scn = new Scanner(System.in);
+        move = scn.nextInt();
+            switch (move){
+                case 1:{
+                    buycard();
+                    break;
+                }
+                case 2:{
+                    reservecard();
+                    break;
+                }
+                case 3:{
+                    getgems();
+                    break;
+                }
+                default:
+                    System.out.println("cos");
+                    break;
+            }
+            player = false;
+        }
+
+    }
+    private void await() throws InterruptedException {
+        System.out.println("koncze ruch");
+
+    }
     /**
      * Starts client and connects to server
      */
@@ -258,9 +409,12 @@ public class Client {
                     getserverHello();
                     sayHello();
                     gameStart();
+                    System.out.println(board.toString());
+                    playermove();
+                    await();
                     // for tests: receive, modify and send object (card)
                 }
-            } catch (IOException | ClassNotFoundException ex) {
+            } catch (IOException | ClassNotFoundException | InterruptedException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }
