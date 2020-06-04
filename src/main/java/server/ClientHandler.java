@@ -1,6 +1,10 @@
 package server;
 
 
+import Model.ClientBoard;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,7 +33,7 @@ public class ClientHandler extends  Thread{
     /**
      * // TODO: change to board
      */
-    final Card card;
+    final ClientBoard board;
     /**
      * HashMap storing player's id with their nicknames
      */
@@ -38,6 +42,7 @@ public class ClientHandler extends  Thread{
      * Server in the game
      */
     private final Server server;
+    //private int turn;
 
     /**
      * ClientHandler constructor
@@ -46,16 +51,16 @@ public class ClientHandler extends  Thread{
      * @param socket client's socket
      * @param playernumber number of players in the game
      * @param server game server
-     * @param card card TODO: change to board
+     * @param board
      * @param hashMap map with nicks and ids
      */
-    public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, int playernumber, Server server, Card card, HashMap<String,String> hashMap) {
+    public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, int playernumber, Server server, ClientBoard board, HashMap<String,String> hashMap) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.socket = socket;
         this.playernumber = playernumber;
         this.server = server;
-        this.card = card;
+        this.board = board;
         this.hashMap = hashMap;
     }
     /*
@@ -135,15 +140,28 @@ public class ClientHandler extends  Thread{
      * @throws IOException
      */
     private void gameStart() throws IOException {
+        ObjectMapper mapper=new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        String jsonBoard =mapper.writeValueAsString(board);
         String response = new JSONObject()
                     .put("answer_type","game_start")
                     .put("nicknames",server.playersnicks.toString())
-                    .put("Board",card.toString())
+                    .put("Board",jsonBoard)
                     .toString();
         outputStream.writeObject(response);
         outputStream.flush();
     }
+    private void increment () {
+        Server.turn = (Server.turn + 1)%playernumber;
+    }
 
+    private void play () {
+        currentThread().setName(server.playersnicks.get(Server.turn));
+        while(currentThread().getName().equals(String.valueOf(Server.turn))) {
+
+
+        }
+    }
     @Override
     public void run() {
         while (true) {
@@ -159,7 +177,7 @@ public class ClientHandler extends  Thread{
                     }
                 }
                 gameStart();
-                System.out.println(hashMap.toString());
+
                 Thread.sleep(100000000);
             }
             catch (InterruptedException | IOException | ClassNotFoundException e) {

@@ -1,6 +1,8 @@
 package server;
 
 
+import Exceptions.InactivePlayersException;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -51,8 +53,8 @@ public class Server {
     /**
      * Instance of game's board
      */
-    public Model.Board board;
-    public Card card;
+    public Model.ClientBoard board;
+    public static int turn=0;
 
     /**
      * Server constructor
@@ -81,20 +83,21 @@ public class Server {
      * Starts server and clients' threads
      */
     public  void runserver() throws IOException {
-        card = new Card(1,1,1,"test");
         try {
             socket = new ServerSocket(serverport);
             System.out.println("Starting Splendor server on port: " + serverport);
+            board = Controller.BoardMaker.generatePresentationBoard();
             for(int i = 0;i<playersNumber;i++) {
                 clientsocket = socket.accept();
                 outputStream = new ObjectOutputStream(clientsocket.getOutputStream());
                 inputStream = new ObjectInputStream(clientsocket.getInputStream());
-                thread = new ClientHandler(outputStream,inputStream,clientsocket,playersNumber,this,card,hashMap);
+                thread = new ClientHandler(outputStream,inputStream,clientsocket,playersNumber,this,board,hashMap);
                 System.out.println(thread.getName());
+                thread.setName(String.valueOf(i));
                 thread.start();
                 }
 
-            } catch (IOException e) {
+            } catch (IOException | InactivePlayersException e) {
                 e.printStackTrace();
                 closeConnection();
             }
