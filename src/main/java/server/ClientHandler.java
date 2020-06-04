@@ -2,6 +2,7 @@ package server;
 
 
 import Model.ClientBoard;
+import Model.ServerBoard;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +34,7 @@ public class ClientHandler extends  Thread{
     /**
      * // TODO: change to board
      */
-    final ClientBoard board;
+    final ServerBoard board;
     /**
      * HashMap storing player's id with their nicknames
      */
@@ -54,7 +55,7 @@ public class ClientHandler extends  Thread{
      * @param board
      * @param hashMap map with nicks and ids
      */
-    public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, int playernumber, Server server, ClientBoard board, HashMap<String,String> hashMap) {
+    public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, int playernumber, Server server, ServerBoard board, HashMap<String,String> hashMap) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.socket = socket;
@@ -143,6 +144,7 @@ public class ClientHandler extends  Thread{
 
         ObjectMapper mapper=new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        //board.setActivePlayer(server.playersnicks.get(0));
         String jsonBoard =mapper.writeValueAsString(board);
         String response = new JSONObject()
                     .put("answer_type","game_start")
@@ -178,6 +180,7 @@ public class ClientHandler extends  Thread{
                     else{
                         server.wait();
                     }
+
                 }
                 gameStart();
                 //verifymove();

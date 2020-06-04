@@ -5,7 +5,7 @@ import Model.*;
 import client.Card;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graalvm.compiler.replacements.SnippetLowerableMemoryNode;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -170,17 +170,18 @@ public class Client {
      * @throws ClassNotFoundException
      */
     public void gameStart() throws IOException, ClassNotFoundException, InactivePlayersException {
-        board = new Model.ClientBoard();
+
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
         nicknames = new ArrayList<>(Arrays.asList(jsonObject.getString("nicknames").replaceAll("(^\\[|\\]$)", "").split(", ")));
         System.out.println(nicknames.toString());
        // System.out.println(jsonObject.getString("Board"));
-
+        Model.ServerBoard serverBoard = new ServerBoard();
         String boardString = jsonObject.getString("Board");
         System.out.println(boardString);
+
         JSONObject boardJSON = new JSONObject(boardString);
-        board.setBankCash(new BankCash(boardJSON.getJSONObject("bankCash").getInt("white"),
+        serverBoard.setBankCash(new BankCash(boardJSON.getJSONObject("bankCash").getInt("white"),
                                        boardJSON.getJSONObject("bankCash").getInt("green"),
                                        boardJSON.getJSONObject("bankCash").getInt("blue"),
                                        boardJSON.getJSONObject("bankCash").getInt("black"),
@@ -198,20 +199,30 @@ public class Client {
                                              costJSON.getInt("red"));
             Model.Noble noble = new Model.Noble(jsonLord.getInt("id"),
                     cost,
-                    jsonLord.getInt("prestige"),
-                    Paths.get(URI.create(jsonLord.getString("imagePath"))));
+                    jsonLord.getInt("prestige"));
             noblesArr[i] = noble;
         }
 
-        board.setNobles(new NoblesOnBoard(noblesArr));
+        serverBoard.setNobles(new NoblesOnBoard(noblesArr));
         HashMap<String,Player> players = new HashMap<>();
         for(int i=0;i<nicknames.size();i++){
-            Player player = new Player(false,nicknames.get(i),new Model.Cash(0,0,0,0,0,0));
+            Player player;
+            if(i==0){
+                 player = new Player(true,nicknames.get(i));
+            }
+            else {
+                 player = new Player(false,nicknames.get(i));
+            }
             players.put(player.getNick(),player);
-            )
+
 
         }
-        board.setPlayers(new HashMap<String, Player>());
+        serverBoard.setPlayers(players);
+        serverBoard.setActivePlayer(nicknames.get(0));
+        System.out.println(serverBoard.toString());
+
+        ClientBoard.setInstanceFromServerBoard(serverBoard);
+
     }
 
   /*  public void play () {
@@ -392,6 +403,7 @@ public class Client {
 
     }
     private void await() throws InterruptedException {
+
         System.out.println("koncze ruch");
 
     }
@@ -409,12 +421,14 @@ public class Client {
                     getserverHello();
                     sayHello();
                     gameStart();
-                    System.out.println(board.toString());
+                    System.out.println(ClientBoard.getInstance().toString());
+                    System.out.println(board.getActivePlayer());
+
                     playermove();
                     await();
                     // for tests: receive, modify and send object (card)
                 }
-            } catch (IOException | ClassNotFoundException | InterruptedException ex) {
+            } catch (IOException | ClassNotFoundException | InterruptedException | InactivePlayersException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }
