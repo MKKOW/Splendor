@@ -146,9 +146,10 @@ public class Game extends JPanel {
         players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],discount[5],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
         add(players[id]);
         players[id].setSize(cardWidth,cardHeight);
+        players[id].forceVisible();
         switch (id) {
             case 0:
-                players[id].setLocation(Width - cardWidth, Height - cardHeight);
+                players[id].setLocation((Width - cardWidth)/2, Height - cardHeight);
                 break;
             case 1:
                 players[id].setLocation(Width - cardWidth, (Height-cardHeight)/2);
