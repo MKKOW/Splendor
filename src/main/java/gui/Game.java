@@ -30,7 +30,9 @@ public class Game extends JPanel {
         cardHeight=frame.getHeight()/6;
         cardWidth=cardHeight*57/88;
         Width=frame.getWidth();
+        System.out.println(Width);
         Height=frame.getHeight();
+        System.out.println(Height);
         x=(Width-cardWidth*5)/2;
         y=(Height-cardHeight*4)/2;
         Menu.setLocation(0,0);
@@ -55,13 +57,22 @@ public class Game extends JPanel {
         coinStacks[3].set(cash.getInt("red"),"black",Color.RED);
         coinStacks[4].set(cash.getInt("black"),"white",Color.BLACK);
         coinStacks[5].set(cash.getInt("yellow"),"black",Color.YELLOW);
+        JSONObject playersOnBoard=board.getJSONObject("players");
+        String[] nicks=JSONObject.getNames(playersOnBoard);
+        int id=0;
+        for(String nick:nicks){
+            System.out.println(nick);
+            System.out.println(id);
+            makePlayer(id,playersOnBoard.getJSONObject(nick));
+            id++;
+        }
         for(int i=0;i<4;i++){
             JSONArray row;
             if(i==0)
                 row=board.getJSONObject("nobles").getJSONArray("nobles");
             else
                 row=board.getJSONObject("developmentCardsOnBoard").getJSONArray("level"+i);
-            for(int j=0;j<row.length();j++){
+            for(int j=0;j<row.length()+(i!=0?1:0);j++){
                 if(i!=0&&j==0){
                     cards[i][j]=new Card(-1,0,0,0,0,0,0,0,0,0,0,0,0,0,true,cardWidth,cardHeight,x+cardWidth*j,y+cardHeight*i,"");
                 }
@@ -110,8 +121,44 @@ public class Game extends JPanel {
     void makePlayer(int id,JSONObject player){
         int[] cost=new int[6];
         int[] discount= new int[6];
+        JSONObject developmentCards=player.getJSONObject("developmentCards");
+        String[] ids=JSONObject.getNames(developmentCards);
+        JSONObject cash=player.getJSONObject("cash");
+        cost[0]+=cash.getInt("white");
+        cost[1]+=cash.getInt("blue");
+        cost[2]+=cash.getInt("green");
+        cost[3]+=cash.getInt("red");
+        cost[4]+=cash.getInt("black");
+        cost[5]+=cash.getInt("yellow");
+        if(ids!=null) {
+            for (String i : ids) {
+                JSONObject card = developmentCards.getJSONObject(i);
+                JSONObject discounts = card.getJSONObject("discount");
+                discount[0] += discounts.getInt("white");
+                discount[1] += discounts.getInt("blue");
+                discount[2] += discounts.getInt("green");
+                discount[3] += discounts.getInt("red");
+                discount[4] += discounts.getInt("black");
+                discount[5] = 0;
+            }
+        }
         int points=0;
         players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],discount[5],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
         add(players[id]);
+        players[id].setSize(cardWidth,cardHeight);
+        switch (id) {
+            case 0:
+                players[id].setLocation(Width - cardWidth, Height - cardHeight);
+                break;
+            case 1:
+                players[id].setLocation(Width - cardWidth, (Height-cardHeight)/2);
+                break;
+            case 2:
+                players[id].setLocation((Width-cardWidth)/2, 0);
+                break;
+            case 3:
+                players[id].setLocation(0, (Height-cardHeight) /2);
+                break;
+        }
     }
 }

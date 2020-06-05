@@ -3,9 +3,6 @@ package gui;
 import Controller.BoardMaker;
 import Exceptions.InactivePlayersException;
 import Model.ClientBoard;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 
@@ -13,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * GUI for the menu section
@@ -61,11 +59,10 @@ public class Menu{
                     ClientBoard clientBoard= BoardMaker.generatePresentationBoard();
                     view.setVisible(false);
                     ObjectMapper mapper=new ObjectMapper();
-                    mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
                     String json =mapper.writeValueAsString(clientBoard);
                     JSONObject board=new JSONObject(json);
                     frame.setContentPane(new Game(frame,board));
-                } catch (InactivePlayersException | JsonProcessingException inactivePlayersException) {
+                } catch (IOException | InactivePlayersException inactivePlayersException) {
                     inactivePlayersException.printStackTrace();
                 }
 
