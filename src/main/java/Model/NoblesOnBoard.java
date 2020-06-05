@@ -7,15 +7,16 @@ import java.util.Arrays;
 
 public class NoblesOnBoard {
 
+    /**
+     * Serial version for serialization purposes
+     */
+    protected static final long serialVersionUID = 789L;
+
     Noble[] nobles;
 
 
     public NoblesOnBoard(Noble[] nobles) {
         this.nobles = nobles;
-    }
-
-    public NoblesOnBoard() {
-        nobles = new Noble[Rules.maxNobleId];
     }
 
     @NotNull

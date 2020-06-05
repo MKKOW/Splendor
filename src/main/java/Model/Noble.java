@@ -1,7 +1,6 @@
 package Model;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.Objects;
 
 /**
@@ -18,13 +17,12 @@ public class Noble extends Card implements Serializable {
     /**
      * All field constructor
      *
-     * @param id        - noble id
-     * @param cost      - noble cost in gems
-     * @param prestige  - noble prestige
-     * @param imagePath - path to image
+     * @param id       - noble id
+     * @param cost     - noble cost in gems
+     * @param prestige - noble prestige
      */
-    public Noble(int id, Cost cost, int prestige, Path imagePath) {
-        super(id, cost, prestige, imagePath);
+    public Noble(int id, Cost cost, int prestige) {
+        super(id, cost, prestige);
     }
 
 
@@ -64,7 +62,6 @@ public class Noble extends Card implements Serializable {
                 "id=" + id +
                 ", cost=" + cost +
                 ", prestige=" + prestige +
-                ", imagePath=" + imagePath +
                 '}';
     }
 }

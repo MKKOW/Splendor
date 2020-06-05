@@ -1,7 +1,6 @@
 package Model;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 
 /**
  * Representation of development card in Model
@@ -24,15 +23,14 @@ public class DevelopmentCard extends Card implements Serializable {
     /**
      * All parameters constructor (from enum level)
      *
-     * @param id        - id of the card [1, 90]
-     * @param cost      - cost of the card
-     * @param prestige  - prestige to player
-     * @param imagePath - path to image of the card
-     * @param level     - level of the card - 1, 2 or 3
-     * @param discount  - discount to player
+     * @param id       - id of the card [1, 90]
+     * @param cost     - cost of the card
+     * @param prestige - prestige to player
+     * @param level    - level of the card - 1, 2 or 3
+     * @param discount - discount to player
      */
-    public DevelopmentCard(int id, Cost cost, int prestige, Path imagePath, Level level, Cost discount) {
-        super(id, cost, prestige, imagePath);
+    public DevelopmentCard(int id, Cost cost, int prestige, Level level, Cost discount) {
+        super(id, cost, prestige);
         this.level = level;
         this.discount = discount;
     }
@@ -43,12 +41,11 @@ public class DevelopmentCard extends Card implements Serializable {
      * @param id            - id of the card [1, 90]
      * @param cost          - cost of the card
      * @param prestige      - prestige to player
-     * @param imagePath     - path to image of the card
      * @param level         - level of the card - 1, 2 or 3
      * @param discountColor - color of discount coin
      */
-    public DevelopmentCard(int id, Cost cost, int prestige, Path imagePath, Level level, Cost.GemColor discountColor) {
-        super(id, cost, prestige, imagePath);
+    public DevelopmentCard(int id, Cost cost, int prestige, Level level, Cost.GemColor discountColor) {
+        super(id, cost, prestige);
         this.level = level;
         this.discount = Cost.fromGemColor(discountColor);
     }
@@ -82,7 +79,6 @@ public class DevelopmentCard extends Card implements Serializable {
                 "id=" + id +
                 ", cost=" + cost +
                 ", prestige=" + prestige +
-                ", imagePath=" + imagePath +
                 ", level=" + level +
                 ", discount=" + discount +
                 '}';

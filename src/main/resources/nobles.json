@@ -5,8 +5,7 @@
     "Red": 3,
     "Green": 3,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Prestige": 3,
@@ -14,8 +13,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Prestige": 3,
@@ -23,8 +21,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 0,
-    "Black": 4,
-    "ImageFile": ""
+    "Black": 4
   },
   {
     "Prestige": 3,
@@ -32,8 +29,7 @@
     "Red": 0,
     "Green": 0,
     "Blue": 4,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Prestige": 3,
@@ -41,8 +37,7 @@
     "Red": 0,
     "Green": 4,
     "Blue": 4,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Prestige": 3,
@@ -50,8 +45,7 @@
     "Red": 0,
     "Green": 3,
     "Blue": 3,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   },
   {
     "Prestige": 3,
@@ -59,8 +53,7 @@
     "Red": 3,
     "Green": 0,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Prestige": 3,
@@ -68,8 +61,7 @@
     "Red": 3,
     "Green": 3,
     "Blue": 3,
-    "Black": 3,
-    "ImageFile": ""
+    "Black": 3
   },
   {
     "Prestige": 3,
@@ -77,8 +69,7 @@
     "Red": 4,
     "Green": 0,
     "Blue": 4,
-    "Black": 4,
-    "ImageFile": ""
+    "Black": 4
   },
   {
     "Prestige": 3,
@@ -86,7 +77,6 @@
     "Red": 4,
     "Green": 4,
     "Blue": 0,
-    "Black": 0,
-    "ImageFile": ""
+    "Black": 0
   }
 ]
