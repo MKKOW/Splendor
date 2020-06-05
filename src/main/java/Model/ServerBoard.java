@@ -43,7 +43,7 @@ public class ServerBoard extends ClientBoard {
      * To get instance use ServerBoard.getInstance()
      * For making server board check BoardMaker class
      */
-    private ServerBoard() {
+    public ServerBoard() {
         super();
         developmentCardPileLevel1 = new Stack<>();
         developmentCardPileLevel2 = new Stack<>();
@@ -56,7 +56,7 @@ public class ServerBoard extends ClientBoard {
         }
         return instance;
     }
-
+    /*
     public static void main(String[] args) throws AmbiguousNickException, IOException {
         // Make fresh random starting ServerBoard
         ServerBoard serverBoard = BoardMaker.generateRandomServerBoard(new String[]{"Paweł", "Wojtek", "Agnieszka", "Mikołaj"});
@@ -73,6 +73,8 @@ public class ServerBoard extends ClientBoard {
         System.out.println("clientBoard.equals(serverBoard) = " + clientBoard.equals(serverBoard));
         System.out.println("serverBoard.equals(clientBoard) = " + serverBoard.equals(clientBoard));
     }
+
+     */
 
     public void refillDevelopmentCards() {
         for (int i = 0; i < Rules.numberOfDevelopmentCardsByLevel; i++) {

@@ -1,6 +1,7 @@
 package server;
 
 
+import Exceptions.AmbiguousNickException;
 import Exceptions.InactivePlayersException;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class Server {
     /**
      * Instance of game's board
      */
-    public Model.ClientBoard board;
+    public Model.ServerBoard board;
     public static int turn=0;
 
     /**
@@ -86,7 +87,7 @@ public class Server {
         try {
             socket = new ServerSocket(serverport);
             System.out.println("Starting Splendor server on port: " + serverport);
-            board = Controller.BoardMaker.generatePresentationBoard();
+            board = Controller.BoardMaker.generateRandomServerBoard(playersNumber);
             for(int i = 0;i<playersNumber;i++) {
                 clientsocket = socket.accept();
                 outputStream = new ObjectOutputStream(clientsocket.getOutputStream());
@@ -97,14 +98,14 @@ public class Server {
                 thread.start();
                 }
 
-            } catch (IOException | InactivePlayersException e) {
+            } catch (IOException | AmbiguousNickException e) {
                 e.printStackTrace();
                 closeConnection();
             }
         }
     public static void main(String[] args)  {
         try{
-            Server server = new Server(defaultport,1);
+            Server server = new Server(defaultport,2);
             server.runserver();
         }
         catch (Exception e){

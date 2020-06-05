@@ -15,12 +15,13 @@ import java.util.Stack;
  * Controller class for making game
  * board for specified number of players
  */
-public class BoardMaker {
+public class    BoardMaker {
 
     private BoardMaker() {
     }
 
-    public static ServerBoard generateRandomServerBoard(String[] nicks) throws IllegalArgumentException, AmbiguousNickException, IOException {
+    public static ServerBoard generateRandomServerBoard(int numberOfPlayers) throws IllegalArgumentException, AmbiguousNickException, IOException {
+        /*
         if (nicks.length < 2 || nicks.length > 4) {
             throw new IllegalArgumentException("Number of players cannot be " + nicks.length);
         }
@@ -29,19 +30,23 @@ public class BoardMaker {
             throw new AmbiguousNickException("Nicks must be unique!");
         }
 
-        int numberOfPlayers = nicks.length;
+         */
+
+        //int numberOfPlayers = nicks.length;
         Rules gameRules = new Rules(numberOfPlayers);
         DeckMaker deckMaker = DeckMaker.getInstance();
         ServerBoard serverBoard = ServerBoard.getInstance();
 
         serverBoard.setRules(gameRules);
         serverBoard.setBankCash(gameRules.startingBankCash());
+        /*
         try {
             serverBoard.setPlayers(makePlayers(nicks));
-        } catch (InactivePlayersException ignored) {
-        } // never thrown in that situation
 
-        serverBoard.setActivePlayer(nicks[0]);
+
+        } // never thrown in that situation
+        */
+        //serverBoard.setActivePlayer(nicks[0]);
 
         Stack<DevelopmentCard>[] cardStacks = deckMaker.makeDevelopmentCardsStacks();
         serverBoard.setDevelopmentCardPileLevel1(cardStacks[0]);
