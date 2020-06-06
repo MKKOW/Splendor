@@ -216,7 +216,9 @@ public class ServerBoard extends ClientBoard {
      * @param nick - nick of player
      */
     public void setActivePlayer(String nick) {
-        activePlayer.setNotActive();
+        if(activePlayer != null){
+            activePlayer.setNotActive();
+        }
         activePlayer = players.get(nick);
         activePlayer.setActive();
     }
@@ -240,7 +242,7 @@ public class ServerBoard extends ClientBoard {
         for (Player player : players.values()) {
             if (player.isActive()) activePlayer = player;
         }
-        if (activePlayer == null) throw new InactivePlayersException("All players in game are inactive");
+        //if (activePlayer == null) throw new InactivePlayersException("All players in game are inactive");
     }
 
     public Stack<DevelopmentCard> getDevelopmentCardPileLevel1() {

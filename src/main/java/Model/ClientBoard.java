@@ -37,6 +37,7 @@ public class ClientBoard implements Serializable {
      */
     protected HashMap<String, Player> players;
 
+
     /**
      * Currently active player
      */
@@ -101,6 +102,10 @@ public class ClientBoard implements Serializable {
     public NoblesOnBoard getNobles() {
         return nobles;
     }
+    public void setActivePlayer(String nick) {
+        this.activePlayer = players.get(nick);
+    }
+
 
     /**
      * Get players
