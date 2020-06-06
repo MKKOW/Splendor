@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static java.lang.Thread.sleep;
+
 public class Client {
     /**
      * Default port to create client socket
@@ -412,14 +414,12 @@ public class Client {
 
     }
     private void await() throws InterruptedException, IOException, ClassNotFoundException {
-        String input = (String) inputStream.readObject();
-        System.out.println(input);
-        JSONObject jsonObject = new JSONObject(input);
-
-        ClientBoard.getInstance().setActivePlayer(jsonObject.getString("player"));
-        System.out.println(ClientBoard.getInstance().getActivePlayer());
-        System.out.println("nowa tura");
-
+                String input = inputStream.readUTF();
+                System.out.println(input);
+                JSONObject jsonObject = new JSONObject(input);
+                ClientBoard.getInstance().setActivePlayer(jsonObject.getString("player"));
+                System.out.println(ClientBoard.getInstance().getActivePlayer());
+                System.out.println("nowa tura");
     }
     /**
      * Starts client and connects to server
@@ -431,20 +431,19 @@ public class Client {
                 System.out.println("Starting Splendor client...\nServer address: " + host + "\nServer port: " + serverPort);
                 inputStream = new ObjectInputStream(clientSocket.getInputStream());
                 outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                while (true) {
                     getserverHello();
                     sayHello();
                     gameStart();
                     while (true) {
                         System.out.println(ClientBoard.getInstance().toString());
                         System.out.println(ClientBoard.getInstance().getActivePlayer());
-                        if (ClientBoard.getInstance().getActivePlayer().getNick().equals(nick)) {
+                        if(ClientBoard.getInstance().getActivePlayer().getNick().equals(nick)) {
                             playermove();
                         }
-                        await();
-                        // for tests: receive, modify and send object (card)
+                            await();
+
                     }
-                }
+
             } catch (IOException | ClassNotFoundException | InactivePlayersException | InterruptedException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
