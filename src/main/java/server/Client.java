@@ -201,7 +201,6 @@ public class Client {
                     cost,
                     jsonLord.getInt("prestige"));
             noblesArr[i] = noble;
-           // serverBoard.setPlayers();
         }
 
         serverBoard.setNobles(new NoblesOnBoard(noblesArr));
@@ -258,7 +257,7 @@ public class Client {
         //startGame();
     }
      */
-    private void buycard() throws IOException, ClassNotFoundException {
+    private void buycard() throws IOException {
         String place;
         int id;
         Scanner scn = new Scanner(System.in);
@@ -279,11 +278,9 @@ public class Client {
         System.out.println(jsonString);
         outputStream.writeObject(jsonString);
         outputStream.flush();
-        String input = (String) inputStream.readObject();
-        System.out.println(input);
-
+        scn.close();
     }
-    private void reservecard() throws IOException, ClassNotFoundException {
+    private void reservecard() throws IOException {
         int id;
         Scanner scn = new Scanner(System.in);
         System.out.println("opcje rezerwacja");
@@ -300,11 +297,9 @@ public class Client {
         System.out.println(jsonString);
         outputStream.writeObject(jsonString);
         outputStream.flush();
-        String input = (String) inputStream.readObject();
-        System.out.println(input);
-
+        scn.close();
     }
-    private void getgems() throws IOException, ClassNotFoundException {
+    private void getgems() throws IOException {
         int move;
         int[] gems = new int[5];
         int sum = 0;
@@ -316,7 +311,7 @@ public class Client {
             case 1: {
                 while(sum!=4) {
                     sum = 0;
-                    System.out.println("Weź 2 klejnoty z dwóch róźnych stosów");
+                    System.out.println("asfjsidf");
                     for (int i = 0; i < gems.length; i++) {
                         gems[i] = scn.nextInt();
                         while (gems[i] != 2 && gems[i] != 0) {
@@ -338,8 +333,6 @@ public class Client {
                 System.out.println(jsonString);
                 outputStream.writeObject(jsonString);
                 outputStream.flush();
-                String input = (String) inputStream.readObject();
-                System.out.println(input);
                 break;
             }
 
@@ -348,7 +341,7 @@ public class Client {
             case 2:{
                 while(sum!=3) {
                     sum =0;
-                    System.out.println("Weź 3 klejnoty z trzech róźnych stosów");
+                    System.out.println("asfjsidf");
                     for (int i = 0; i < gems.length; i++) {
                         gems[i] = scn.nextInt();
                         while (gems[i] != 1 && gems[i] != 0) {
@@ -370,20 +363,18 @@ public class Client {
                 System.out.println(jsonString);
                 outputStream.writeObject(jsonString);
                 outputStream.flush();
-                String input = (String) inputStream.readObject();
-                System.out.println(input);
                 break;
 
             }
             default:
-                System.out.println("zły input");
+                System.out.println("cos");
                 break;
         }
-
+        scn.close();
 
     }
 
-    private void playermove() throws IOException, ClassNotFoundException {
+    private void playermove() throws IOException {
         boolean player = true;
         while(player){
         int move;
@@ -404,21 +395,16 @@ public class Client {
                     break;
                 }
                 default:
-                    System.out.println("zły input");
+                    System.out.println("cos");
                     break;
             }
             player = false;
         }
 
     }
-    private void await() throws InterruptedException, IOException, ClassNotFoundException {
-        String input = (String) inputStream.readObject();
-        System.out.println(input);
-        JSONObject jsonObject = new JSONObject(input);
+    private void await() throws InterruptedException {
 
-        ClientBoard.getInstance().setActivePlayer(jsonObject.getString("player"));
-        System.out.println(ClientBoard.getInstance().getActivePlayer());
-        System.out.println("nowa tura");
+        System.out.println("koncze ruch");
 
     }
     /**
@@ -435,17 +421,14 @@ public class Client {
                     getserverHello();
                     sayHello();
                     gameStart();
-                    while (true) {
-                        System.out.println(ClientBoard.getInstance().toString());
-                        System.out.println(ClientBoard.getInstance().getActivePlayer());
-                        if (ClientBoard.getInstance().getActivePlayer().getNick().equals(nick)) {
-                            playermove();
-                        }
-                        await();
-                        // for tests: receive, modify and send object (card)
-                    }
+                    System.out.println(ClientBoard.getInstance().toString());
+                    System.out.println(board.getActivePlayer());
+
+                    playermove();
+                    await();
+                    // for tests: receive, modify and send object (card)
                 }
-            } catch (IOException | ClassNotFoundException | InactivePlayersException | InterruptedException ex) {
+            } catch (IOException | ClassNotFoundException | InterruptedException | InactivePlayersException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }

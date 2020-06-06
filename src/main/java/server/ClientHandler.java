@@ -35,7 +35,7 @@ public class ClientHandler implements Runnable{
      * Number of players in the game
      */
     /**
-     * // TODO: change to board
+     * Server board
      */
     private Player player;
 
