@@ -414,7 +414,9 @@ public class Client {
 
     }
     private void await() throws InterruptedException, IOException, ClassNotFoundException {
-                String input = inputStream.readUTF();
+                String input ="";
+                input = (String) inputStream.readObject();
+                //input2 = (String) inputStream.readObject();
                 System.out.println(input);
                 JSONObject jsonObject = new JSONObject(input);
                 ClientBoard.getInstance().setActivePlayer(jsonObject.getString("player"));
@@ -440,7 +442,8 @@ public class Client {
                         if(ClientBoard.getInstance().getActivePlayer().getNick().equals(nick)) {
                             playermove();
                         }
-                            await();
+                        await();
+
 
                     }
 
