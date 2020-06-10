@@ -25,6 +25,10 @@ public class Noble extends Card implements Serializable {
         super(id, cost, prestige);
     }
 
+    boolean canVisit(Player player) {
+        return player.getTotalDiscount().enough(getCost());
+    }
+
 
     /**
      * Check if noble is equal to another.

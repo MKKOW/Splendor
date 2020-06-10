@@ -1,13 +1,14 @@
 package Model;
 
-import Exceptions.IllegalCashAmountException;
-import Exceptions.TooMuchCashException;
+import Exceptions.NotEnoughCashException;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 
 /**
  * Representation of cash in a bank in a Model
  */
-public class BankCash extends Cost {
+public class BankCash extends Cost implements Serializable {
 
     /**
      * Serial version for serialization purposes
@@ -36,29 +37,51 @@ public class BankCash extends Cost {
     }
 
     /**
+     * Empty constructor
+     */
+    BankCash() {
+        super();
+        this.yellow = 0;
+    }
+
+    /**
      * If it's possible give yellow coin to player
      *
      * @param player - player to give yellow coin to
-     * @throws TooMuchCashException - if player has too much cash
+     *
+     * @return true if successfully added, false otherwise
      */
-    public void giveYellow(@NotNull Player player) throws TooMuchCashException {
+    boolean giveYellow(@NotNull Player player) {
         if (getYellow() > 0) {
-            try {
-                player.addCash(new Cash(0, 0, 0, 0, 0, 1));
-            } catch (IllegalCashAmountException ignored) {
-            } // never thrown
+            player.addYellow();
             this.yellow -= 1;
+            return true;
         }
+        return false;
     }
 
-    // TODO: do this, only placeholder
-    public void sub(Cash cash) {
-        white -= cash.white;
-        green -= cash.green;
-        blue -= cash.blue;
-        black -= cash.black;
-        red -= cash.red;
-        yellow -= cash.yellow;
+    /**
+     * If possible subtract some number of coins from the bank.
+     * If it is not possible throw exception
+     * @param cash - cash to subtrect from bank
+     * @throws NotEnoughCashException - when bank has too little cash
+     */
+    void subCash(Cash cash) throws NotEnoughCashException {
+        if (!enough(cash)) throw new NotEnoughCashException("Not enough cash in bank");
+        this.white -= cash.white;
+        this.green -= cash.green;
+        this.blue -= cash.blue;
+        this.black -= cash.black;
+        this.yellow -= cash.yellow;
+    }
+
+    /**
+     * Check if bank has enough cash to subtract from
+     * @param cash - cash to subtract
+     * @return true if yes, false if no
+     */
+    boolean enough(Cash cash) {
+        return white >= cash.white && green >= cash.green && blue >= cash.blue && black >= cash.black && yellow >= cash.yellow;
     }
 
     /**

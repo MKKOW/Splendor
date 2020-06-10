@@ -58,9 +58,9 @@ public class ClientBoard implements Serializable {
      * This constructor is public because ClientBoard is base class.
      */
     public ClientBoard() {
-        bankCash = null;
+        bankCash = new BankCash(0,0,0,0,0,0);
         nobles = null;
-        players = null;
+        players = new HashMap<>();
         activePlayer = null;
     }
 

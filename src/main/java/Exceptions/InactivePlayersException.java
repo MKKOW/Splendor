@@ -1,6 +1,6 @@
 package Exceptions;
 
-public class InactivePlayersException extends Exception {
+public class InactivePlayersException extends RuntimeException {
 
     public InactivePlayersException() {
     }

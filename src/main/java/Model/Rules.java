@@ -1,9 +1,10 @@
 package Model;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Rules {
+public class Rules implements Serializable {
 
     /**
      * Number of each level development cards in the board
@@ -13,16 +14,14 @@ public class Rules {
      * Maximal id for Level 1 development card
      */
     public static final int maxDevelopmentCardLevel1Id = 40;
-
     /**
      * Max cash that player is allowed to have
      */
-    public static final int MaxPlayerCash = 10;
+    public static final int maxPlayerCash = 10;
     /**
      * Maximal id for Level 2 development card
      */
     public static final int maxDevelopmentCardLevel2Id = 70;
-
     /**
      * Amount of prestige needed for player to win
      */
@@ -59,24 +58,22 @@ public class Rules {
      * Number of starting nobles on board
      */
     public final int startingNumberOfNoblesOnBoard;
-    private final int numberOfPlayers;
+    /**
+     * Number of players int the game
+     */
+    public final int numberOfPlayers;
 
-    public Rules(int numberOfPlayers) throws IllegalArgumentException {
+    /**
+     * Constructor from numberOfPlayers
+     * Create board rules for specific number of players
+     * @param numberOfPlayers - integer number of players from 2 to 4 including both ends
+     * @throws IllegalArgumentException - if number of players is incorrect
+     */
+    public Rules(int numberOfPlayers) {
         if (numberOfPlayers < 2 || numberOfPlayers > 4) {
             throw new IllegalArgumentException("Number of players cannot be " + numberOfPlayers);
         }
         this.numberOfPlayers = numberOfPlayers;
         this.startingNumberOfNoblesOnBoard = numberOfPlayers + 1;
-    }
-
-    public BankCash startingBankCash() {
-        if (numberOfPlayers == 2) {
-            return new BankCash(4, 4, 4, 4, 4, 6);
-        }
-        if (numberOfPlayers == 3) {
-            return new BankCash(5, 5, 5, 5, 5, 6);
-        } else {
-            return new BankCash(6, 6, 6, 6, 6, 6);
-        }
     }
 }
