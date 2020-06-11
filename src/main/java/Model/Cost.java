@@ -35,6 +35,17 @@ public class Cost implements Serializable {
      */
     protected int red;
 
+    /**
+     * Enumerator corresponding to gem colors
+     */
+    public enum GemColor {
+        White,
+        Green,
+        Blue,
+        Black,
+        Red
+    }
+
 
     /**
      * All parameter constructor
@@ -57,7 +68,11 @@ public class Cost implements Serializable {
         this.red = red;
     }
 
-    public Cost() {
+    /**
+     * Basic, empty constructor.
+     * Make cost object with all fields set to 0
+     */
+    Cost() {
         this.white = 0;
         this.green = 0;
         this.blue = 0;
@@ -72,7 +87,7 @@ public class Cost implements Serializable {
      * @param cost - cost to subtract from
      * @return true if there is, false otherwise
      */
-    public boolean enough(@NotNull Cost cost) {
+    boolean enough(@NotNull Cost cost) {
         return white >= cost.white && green >= cost.green && blue >= cost.blue && black >= cost.black;
     }
 
@@ -83,7 +98,7 @@ public class Cost implements Serializable {
      * @return Cost object corresponding to discount
      */
     @NotNull
-    public static Cost fromGemColor(@NotNull GemColor discountColor) {
+    static Cost fromGemColor(@NotNull GemColor discountColor) {
         Cost cost = null;
         switch (discountColor) {
             case White:
@@ -110,7 +125,7 @@ public class Cost implements Serializable {
      *
      * @param other - other cost to add
      */
-    public Cost add(@org.jetbrains.annotations.NotNull Cost other) {
+    Cost add(@NotNull Cost other) {
         white += other.white;
         green += other.green;
         blue += other.blue;
@@ -118,14 +133,13 @@ public class Cost implements Serializable {
         red += other.red;
         return this;
     }
-
-
+    
     /**
-     * Sum of all the gems
+     * Sum white, green, blue, black and red gems
      *
-     * @return sum
+     * @return int - sum of gems
      */
-    public int sum() {
+    int sum() {
         return white + green + blue + black + red;
     }
 
@@ -193,12 +207,14 @@ public class Cost implements Serializable {
                 getRed() == cost.getRed();
     }
 
-    public enum GemColor {
-        White,
-        Green,
-        Blue,
-        Black,
-        Red
+    /**
+     * Check if any field contains specified amount
+     * (only on needed)
+     * @param amount - integer to check
+     * @return true if contains, false otherwise
+     */
+    public boolean any(int amount) {
+        return white == amount || green == amount || blue == amount || black == amount || red == amount;
     }
 
     /**

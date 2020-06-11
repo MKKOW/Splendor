@@ -1,6 +1,7 @@
 package Model;
 
 import Exceptions.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,24 +16,22 @@ public class Player implements Serializable {
      * Serial version for serialization purposes
      */
     protected static final long serialVersionUID = 789L;
-
     /**
      * Player's nick
      */
-    private final String nick;
-
+    private String nick;
     /**
      * Hashmap of cards owned by player
      */
-    private final HashMap<Integer, DevelopmentCard> developmentCards;
+    private HashMap<Integer, DevelopmentCard> developmentCards;
     /**
      * Hashmap of nobles owned by player
      */
-    private final HashMap<Integer, Noble> nobles;
+    private HashMap<Integer, Noble> nobles;
     /**
      * Player's cash
      */
-    private final Cash cash;
+    private Cash cash;
     /**
      * Indicator of activity
      */
@@ -41,6 +40,10 @@ public class Player implements Serializable {
      * Currently holden development card
      */
     private DevelopmentCard claimedCard;
+    /**
+     * Number of correct moves
+     */
+    private int numberOfMoves;
 
     /**
      * All parameter constructor
@@ -50,19 +53,22 @@ public class Player implements Serializable {
      * @param developmentCards - developments cards owned
      * @param nobles           - nobles owned
      * @param cash             - player's cash
-     * @param claimedCard      -
+     * @param claimedCard      - card currently on hand
      */
-    public Player(boolean active, String nick, HashMap<Integer, DevelopmentCard> developmentCards, HashMap<Integer, Noble> nobles, Cash cash, DevelopmentCard claimedCard) {
+    public Player(boolean active, String nick, HashMap<Integer, DevelopmentCard> developmentCards, HashMap<Integer, Noble> nobles, Cash cash, DevelopmentCard claimedCard, int numberOfMoves) {
         this.active = active;
         this.nick = nick;
         this.developmentCards = developmentCards;
         this.nobles = nobles;
         this.cash = cash;
         this.claimedCard = claimedCard;
+        this.numberOfMoves = numberOfMoves;
     }
 
     /**
-     * Game start constructor
+     * Game start constructor.
+     * Construct player without cash, developmentCards, Noble cards
+     * and without any claimed card
      *
      * @param active - indicator if player is currently active
      * @param nick   - nick of the player
@@ -74,40 +80,44 @@ public class Player implements Serializable {
         this.nobles = new HashMap<>();
         this.cash = new Cash(0, 0, 0, 0, 0, 0);
         this.claimedCard = null;
+        this.numberOfMoves = 0;
     }
 
     /**
      * Add cash to player
+     * and then check if he has too much cash, if so throw exception
      *
      * @param cashToAdd - amount of cash to add
-     * @throws TooMuchCashException - if sum of player's cash if grater than he is allowed to have
      */
-    public void addCash(Cash cashToAdd) throws TooMuchCashException, IllegalCashAmountException {
-        cash.add(cashToAdd);
-        if (cash.sum() > Rules.MaxPlayerCash) throw new TooMuchCashException("Player " + nick + "has to much cash");
+    public void addCash(Cash cashToAdd) throws IllegalCashAmountException {
+        try {
+            cash.addCash(cashToAdd);
+        } catch (IllegalCashAmountException e) {
+            throw new IllegalCashAmountException(nick + " cannot get that cash amount (against the rules)");
+        }
     }
 
+
     /**
-     * Subtract cost from player's cash without using yellow gems
+     * Subtract cost from player's cash allowing usage of yellow cards
+     * if player do not have enough gems of color
      *
-     * @param costToSub - cost to subtract
-     * @throws NotEnoughCashException - if player doesn't have enough cash to subtract from
+     * @param costToSub - cost to subtract (development card cost)
+     * @throws NotEnoughCashException - if player doesn't have enough cash to subtract from even using all his yellow gems
      */
     public void subCost(Cost costToSub) throws NotEnoughCashException {
-        cash.sub(costToSub);
+        try {
+            cash.subCost(costToSub);
+        } catch (NotEnoughCashException e) {
+            throw new NotEnoughCashException(nick + " has not enough cash", e);
+        }
     }
 
-    /**
-     * Subtract cost from player's cash allowing to use maxYellow yellow gems
-     *
-     * @param costToSub - cost to subtract
-     * @param maxYellow - max number of yellow gems to use
-     * @throws NotEnoughCashException   - if player doesn't have enough cash to subtract from (including yellow gems)
-     * @throws IllegalArgumentException - if maxYellow is negative or more than player has yellow gems
-     */
-    public void subCost(Cost costToSub, int maxYellow) throws NotEnoughCashException, IllegalArgumentException {
-        cash.sub(costToSub, maxYellow);
+
+    public void subCash(Cash cash) throws NotEnoughCashException {
+        this.cash.subCash(cash);
     }
+
 
     /**
      * Claim development card
@@ -115,21 +125,10 @@ public class Player implements Serializable {
      * @param cardToClaim - development card to claim
      * @throws TooManyClaimsException - if player is already claiming some card
      */
-    public void claimDevelopmentCard(DevelopmentCard cardToClaim) throws TooManyClaimsException {
+    public void claimDevelopmentCard(@NotNull DevelopmentCard cardToClaim) throws TooManyClaimsException {
         if (claimedCard != null)
             throw new TooManyClaimsException("Player" + nick + " already holds a development card " + claimedCard);
         claimedCard = cardToClaim;
-    }
-
-    /**
-     * Remove card from claimed cards
-     *
-     * @throws NothingClaimedException - if nothing is claimed
-     */
-    public void removeClaimedDevelopmentCard() throws NothingClaimedException {
-        if (claimedCard == null)
-            throw new NothingClaimedException("Player" + nick + " is currently not holding any development card.");
-        claimedCard = null;
     }
 
     /**
@@ -137,15 +136,22 @@ public class Player implements Serializable {
      *
      * @param cardToAdd - development card to add
      */
-    public void addDevelopmentCard(DevelopmentCard cardToAdd) {
+    public void addDevelopmentCard(@NotNull DevelopmentCard cardToAdd) {
         developmentCards.put(cardToAdd.getId(), cardToAdd);
     }
 
     /**
      * Add claimed development card to player's cards
      */
-    public void addClaimedDevelopmentCard() {
+    public void addClaimedDevelopmentCard() throws NothingClaimedException {
+        if (claimedCard == null)
+            throw new NothingClaimedException(nick + " is not claiming any card!");
         developmentCards.put(claimedCard.getId(), claimedCard);
+    }
+
+    public void removeClaim() throws NothingClaimedException {
+        if (claimedCard == null)
+            throw new NothingClaimedException(nick + " is not claiming any card!");
         claimedCard = null;
     }
 
@@ -155,8 +161,8 @@ public class Player implements Serializable {
      * @param nobleToAdd - noble card to add
      * @throws NotEnoughDiscountException - if player do not have enough discount to get that noble
      */
-    public void addNoble(Noble nobleToAdd) throws NotEnoughDiscountException {
-        if (!(getTotalDiscount().enough(nobleToAdd.getCost())))
+    public void addNoble(@NotNull Noble nobleToAdd) throws NotEnoughDiscountException {
+        if (!nobleToAdd.canVisit(this))
             throw new NotEnoughDiscountException("Player " + nick + " has too little discount (" + getTotalDiscount() + ") to get noble " + nobleToAdd);
         nobles.put(nobleToAdd.getId(), nobleToAdd);
     }
@@ -191,17 +197,19 @@ public class Player implements Serializable {
     }
 
     /**
-     * Set player as active
+     * Check if player is over allowed cash limit
+     *
+     * @return true if yes, false otherwise
      */
-    public void setActive() {
-        active = true;
+    public boolean isOverCashLimit() {
+        return cash.sum() > Rules.maxPlayerCash;
     }
 
     /**
-     * Unset player as active
+     * Set player as active
      */
-    public void setNotActive() {
-        active = false;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     /**
@@ -211,6 +219,14 @@ public class Player implements Serializable {
      */
     public boolean isActive() {
         return active;
+    }
+
+
+    /**
+     * Increment (add 1) to number of moves
+     */
+    public void incrementNumberOfMoves() {
+        this.numberOfMoves += 1;
     }
 
     /**
@@ -246,6 +262,41 @@ public class Player implements Serializable {
 
     public DevelopmentCard getClaimedCard() {
         return claimedCard;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public void setDevelopmentCards(HashMap<Integer, DevelopmentCard> developmentCards) {
+        this.developmentCards = developmentCards;
+    }
+
+    public void setNobles(HashMap<Integer, Noble> nobles) {
+        this.nobles = nobles;
+    }
+
+    public void setCash(Cash cash) {
+        this.cash = cash;
+    }
+
+    public void setClaimedCard(DevelopmentCard claimedCard) {
+        this.claimedCard = claimedCard;
+    }
+
+    public int getNumberOfMoves() {
+        return numberOfMoves;
+    }
+
+    public void setNumberOfMoves(int numberOfMoves) {
+        this.numberOfMoves = numberOfMoves;
+    }
+
+    /**
+     * Add yellow coin to players cash
+     */
+    void addYellow() {
+        cash.yellow += 1;
     }
 
     /**
