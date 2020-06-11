@@ -3,12 +3,13 @@ package Model;
 import Exceptions.CardNotOnBoardException;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Representation of cards on the board
  */
-public class CardsOnBoard {
+public class CardsOnBoard implements Serializable {
 
     /**
      * Serial version for serialization purposes
@@ -56,6 +57,7 @@ public class CardsOnBoard {
 
     /**
      * Get development card by its id
+     * and remove it from the board
      *
      * @param cardId - id of a card
      * @return DevelopmentCard on board
@@ -65,27 +67,54 @@ public class CardsOnBoard {
     public DevelopmentCard getCardById(int cardId) throws CardNotOnBoardException {
         DevelopmentCard developmentCard = null;
         if (cardId <= Rules.maxDevelopmentCardLevel1Id) {
+            for (DevelopmentCard card : level1) {
+                if (card != null && card.getId() == cardId) {
+                    return card;
+                }
+            }
+        } else if (cardId <= Rules.maxDevelopmentCardLevel2Id) {
+            for (DevelopmentCard card : level2) {
+                if (card != null && card.getId() == cardId) {
+                    return card;
+                }
+            }
+        } else {
+            for (DevelopmentCard card : level3) {
+                if (card != null && card.getId() == cardId) {
+                    return card;
+                }
+            }
+        }
+        throw new CardNotOnBoardException("Card of id " + cardId + " is not on board.");
+    }
+
+
+    /**
+     * Remove reference to development card by that id from the board
+     *
+     * @param cardId - id of a card
+     * @throws CardNotOnBoardException - if card not found on board
+     */
+    public void removeCardById(int cardId) throws CardNotOnBoardException {
+        if (cardId <= Rules.maxDevelopmentCardLevel1Id) {
             for (int i = 0; i < level1.length; i++) {
                 if (level1[i] != null && level1[i].getId() == cardId) {
-                    developmentCard = level1[i];
                     level1[i] = null;
-                    return developmentCard;
+                    return;
                 }
             }
         } else if (cardId <= Rules.maxDevelopmentCardLevel2Id) {
             for (int i = 0; i < level2.length; i++) {
                 if (level2[i] != null && level2[i].getId() == cardId) {
-                    developmentCard = level2[i];
                     level2[i] = null;
-                    return developmentCard;
+                    return;
                 }
             }
         } else {
             for (int i = 0; i < level3.length; i++) {
                 if (level3[i] != null && level3[i].getId() == cardId) {
-                    developmentCard = level3[i];
                     level3[i] = null;
-                    return developmentCard;
+                    return;
                 }
             }
         }

@@ -4,16 +4,16 @@ import Exceptions.IllegalCashAmountException;
 import Exceptions.NotEnoughCashException;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Representation of player or bank cash in the Model.
+ * Representation of player's cash in the Model.
  *
  * This class extends Cost adding to it additional yellow
- * (gold) coins that player can use as any other cash token,
- * and bank can serve to players claiming cards.
+ * (gold) coins that player can use as any other cash token
  */
-public class Cash extends Cost {
+public class Cash extends Cost implements Serializable {
 
     /**
      * Number of yellow coins
@@ -31,19 +31,38 @@ public class Cash extends Cost {
      * @param yellow - number of yellow gems
      * @throws IllegalArgumentException - thrown when one or more arguments is negative
      */
-    public Cash(int white, int green, int blue, int black, int red, int yellow) throws IllegalArgumentException {
+    Cash(int white, int green, int blue, int black, int red, int yellow) throws IllegalArgumentException {
         super(white, green, blue, black, red);
         if (yellow < 0) throw new IllegalArgumentException("Yellow tokens cannot be negative");
         this.yellow = yellow;
     }
 
     /**
-     * check if given cash amount is allowed to add to players
+     * Empty constructor
+     */
+    Cash() {
+        super();
+        this.yellow = 0;
+    }
+
+    /**
+     * Check if given cash amount is allowed to add to players
      *
      * @param cost - cost to add
      */
-    private static void checkAllowedCashAmount(Cost cost) throws IllegalCashAmountException {
-        // TODO: do this
+    private static boolean checkGetAmount(Cost cost){
+        if (cost.sum() == 0) return false; // why would you do that?
+        // All fields must be less than 3
+        if (cost.any(3)) return false;
+        // Check if player do not get more than 3 coins
+        if (cost.sum() > 3) return false;
+        // if any coin in cost is one, player cannot get more than one coin of each
+        else if (cost.any(1) && (cost.white > 1 || cost.green > 1 || cost.blue > 1 || cost.black > 1 || cost.red > 1)) {
+            return false;
+        }
+        // else if at least one coin is 2, there cannot be any more coins
+        else return !cost.any(2) || cost.sum() == 2;
+        // if passed all tests
     }
 
     /**
@@ -52,73 +71,63 @@ public class Cash extends Cost {
      * @param cash - cash to add
      * @return this for further chaining
      */
-    public Cash add(Cash cash) throws IllegalCashAmountException {
-        checkAllowedCashAmount(cash);
+    Cash addCash(Cash cash) throws IllegalCashAmountException {
+        if (!checkGetAmount(cash)) {
+            throw new IllegalCashAmountException("Player cannot get " + cash + " cash in one turn.");
+        }
+        super.add(cash);
+        yellow += cash.yellow;
+        return this;
+    }
+
+
+    /**
+     * Add the cash even if player is not allowed to have that many cash
+     *
+     * @param cash - cash to add
+     * @return this for further chaining
+     */
+    Cash addCashForce(Cash cash) {
         super.add(cash);
         yellow += cash.yellow;
         return this;
     }
 
     /**
-     * Subtract cost from this cash without using yellow gems
-     *
-     * @param cost - cost to subtract
-     * @throws NotEnoughCashException - thrown when there is not enough cash to subtract from
-     */
-    public void sub(Cost cost) throws NotEnoughCashException {
-        if (!enough(cost)) {
-            throw new NotEnoughCashException(this + " isn't enough to sub from (excluding yellow)" + cost);
-        }
-        white -= cost.white;
-        green -= cost.green;
-        blue -= cost.blue;
-        black -= cost.black;
-        red -= cost.red;
-    }
-
-    /**
      * Subtract cost from this cash allowing using yellow gems
      *
      * @param cost      - cost to subtract from
-     * @param maxYellow - max number of yellow coins to use
-     * @throws IllegalArgumentException - thrown when number of maxYellow to use is bigger than owned yellow coins
-     * @throws NotEnoughCashException   - thrown when there is not enough cash to subtract from
+     * @throws NotEnoughCashException   - thrown when there is not enough cash to subtract from even using all yellow gems
      */
-    public Cash sub(Cost cost, int maxYellow) throws IllegalArgumentException, NotEnoughCashException {
-        if (!enough(cost, maxYellow)) {
-            throw new NotEnoughCashException(this + " isn't enough to sub from (including yellow)" + cost);
+    public Cash subCost(Cost cost) throws IllegalArgumentException, NotEnoughCashException {
+        if (!enough(cost)) {
+            throw new NotEnoughCashException(this + " isn't enough to sub from " + cost);
         }
         white -= cost.white;
         if (white < 0) {
-            maxYellow += white;
             yellow += white;
             white = 0;
         }
         green -= cost.green;
         if (green < 0) {
-            maxYellow += green;
             yellow += green;
             green = 0;
         }
         blue -= cost.blue;
         if (blue < 0) {
-            maxYellow += blue;
             yellow += blue;
             blue = 0;
         }
         black -= cost.black;
         if (black < 0) {
-            maxYellow += black;
             yellow += black;
             black = 0;
         }
         red -= cost.red;
         if (red < 0) {
-            maxYellow += red;
             yellow += red;
             red = 0;
         }
-        assert maxYellow >= 0 : "Error: Bug in Cash class. maxYellow should never be negative at this point";
         return this;
     }
 
@@ -130,33 +139,27 @@ public class Cash extends Cost {
      * @return true if there is, false otherwise
      */
     public boolean enough(@NotNull Cost cost) {
-        return white >= cost.white && green >= cost.green && blue >= cost.blue && black >= cost.black;
+        int result = 0;
+        if (white - cost.white < 0) {
+            result += white - cost.white;
+        }
+        if (green - cost.green < 0) {
+            result += green - cost.green;
+        }
+        if (blue - cost.blue < 0) {
+            result += blue - cost.blue;
+        }
+        if (black - cost.black < 0) {
+            result += black - cost.black;
+        }
+        if (red - cost.red < 0) {
+            result += red - cost.red;
+        }
+        return result < yellow;
     }
 
     /**
-     * Check if there is enough cash to subtract cost
-     * with yellow gems
-     *
-     * @param cost      - cost to subtract from
-     * @param maxYellow - maximal number of yellow gems to use
-     * @return true if enough, false otherwise
-     * @throws IllegalArgumentException - thrown when number of maxYellow to use is bigger than owned yellow coins
-     */
-    public boolean enough(Cost cost, int maxYellow) throws IllegalArgumentException {
-        if (maxYellow < 0) {
-            throw new IllegalArgumentException("maxYellow cannot be negative");
-        }
-        if (maxYellow > this.yellow) {
-            throw new IllegalArgumentException("Not enough yellow tokens.");
-        }
-        if (cost.sum() > sum()) {
-            return false;
-        }
-        return (sum() - cost.sum() - yellow + maxYellow) >= 0;
-    }
-
-    /**
-     * Sum all the gems
+     * Sum white, green, blue, black, red and yellow gems
      *
      * @return sum of gems in cash
      */
@@ -173,7 +176,6 @@ public class Cash extends Cost {
     public int getYellow() {
         return yellow;
     }
-
 
     /**
      * String representation of an Object
@@ -220,5 +222,23 @@ public class Cash extends Cost {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getYellow());
+    }
+
+    /**
+     * Subtract cash.
+     * In this mode all fields of cost must be equal or
+     * less than this fields.
+     * @param cash
+     */
+    public void subCash(Cash cash) throws NotEnoughCashException {
+        if (!enough(cash) || this.yellow < cash.yellow) {
+            throw new NotEnoughCashException("Not enough cash to subtract " + cash + " from " + this);
+        }
+        this.white -= cash.white;
+        this.green -= cash.green;
+        this.black -= cash.black;
+        this.blue -= cash.blue;
+        this.red -= cash.red;
+        this.yellow -= cash.yellow;
     }
 }

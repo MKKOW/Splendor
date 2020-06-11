@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 
-public class ClientHandler implements Runnable{
+import static java.lang.Thread.sleep;
+
+public class ClientHandler implements Runnable {
     /**
      * Data output
      */
@@ -162,13 +164,7 @@ public class ClientHandler implements Runnable{
         outputStream.writeObject(response);
         outputStream.flush();
     }
-    private void increment () throws IOException {
-        server.turn = (server.turn + 1)%server.playersNumber;
-        System.out.println(server.turn);
-        ServerBoard.getInstance().setActivePlayer(server.playersnicks.get(server.turn));
-        System.out.println(server.board.getActivePlayer());
-        updategame();
-    }
+
 /*
     private void play () {
         currentThread().setName(server.playersnicks.get(Server.turn));
@@ -181,7 +177,7 @@ public class ClientHandler implements Runnable{
 
     }
  */
-    private void turn() throws IOException, ClassNotFoundException {
+    private void turn() throws IOException, ClassNotFoundException, InterruptedException {
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
         String response;
@@ -208,17 +204,37 @@ public class ClientHandler implements Runnable{
                         .toString();
                 outputStream.writeObject(response);
                 outputStream.flush();
+
+        }
+
+
+    }
+    private synchronized void updategame() throws IOException, ClassNotFoundException, InterruptedException {
+        String response = new JSONObject()
+                .put("answer_type", "game_board")
+                .put("next_player", server.playersnicks.get((server.turn + 1) % server.playersNumber))
+                .put("player", ServerBoard.getInstance().getActivePlayer().getNick())
+                .toString();
+        server.blockingQueue.clear();
+        for(int i =0;i<server.playersNumber;i++) {
+            server.blockingQueue.put(response);
         }
 
     }
-    private void updategame() throws IOException {
-        String response = new JSONObject()
-                .put("answer_type","game_board")
-                .put("next_player",server.playersnicks.get((server.turn+1)%server.playersNumber))
-                .put("player",server.board.getActivePlayer().getNick())
-                .toString();
+    private synchronized void sendgame() throws InterruptedException, IOException {
+
+        String response = server.blockingQueue.take();
         outputStream.writeObject(response);
         outputStream.flush();
+
+
+    }
+    private synchronized void increment() throws IOException, ClassNotFoundException, InterruptedException {
+        server.turn = (server.turn + 1)%server.playersNumber;
+        System.out.println(server.turn);
+        ServerBoard.getInstance().setActivePlayer(server.playersnicks.get(server.turn));
+        System.out.println(ServerBoard.getInstance().getActivePlayer());
+        updategame();
     }
     @Override
     public void run() {
@@ -236,18 +252,21 @@ public class ClientHandler implements Runnable{
 
                 }
                 gameStart();
-                while(true) {
-                    synchronized (server) {
-                        if (server.board.getActivePlayer().getNick().equals(player.getNick())) {
-                            turn();
-                            increment();
-                            server.notifyAll();
-                        } else {
-                            server.wait();
+                while (true){
+                       // synchronized (server) {
+                            if (server.board.getActivePlayer().getNick().equals(player.getNick())) {
+                                turn();
+                                increment();
+                                //updategame();
+                               // server.notifyAll();
+                            //}
+                           // else {
+                              //  server.wait();
+                           // }
 
                         }
-                        updategame();
-                    }
+                        System.out.println("sending data");
+                        sendgame();
                 }
             }
             catch (InterruptedException | IOException | ClassNotFoundException | InactivePlayersException e) {

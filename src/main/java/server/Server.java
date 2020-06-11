@@ -62,6 +62,7 @@ public class Server {
     public Model.ServerBoard board;
     public int turn=0;
     HashMap<String, Player>  playerHashMap = new HashMap<>();
+    final BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<String>();
     /**
      * Server constructor
      * @param serverport server port to run

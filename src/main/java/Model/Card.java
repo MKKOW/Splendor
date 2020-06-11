@@ -1,11 +1,17 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Abstract base class for cards available in the board
  */
-public abstract class Card {
+public abstract class Card implements Serializable {
+
+    /**
+     * Serial version for serialization purposes
+     */
+    protected static final long serialVersionUID = 789L;
 
     /**
      * Card id

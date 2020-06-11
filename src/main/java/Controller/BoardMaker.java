@@ -1,52 +1,39 @@
 package Controller;
 
-import Exceptions.AmbiguousNickException;
 import Exceptions.InactivePlayersException;
 import Model.*;
-import server.Client;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Stack;
 
 /**
  * Controller class for making game
  * board for specified number of players
  */
-public class    BoardMaker {
+public class BoardMaker {
 
     private BoardMaker() {
     }
 
-    public static ServerBoard generateRandomServerBoard(int numberOfPlayers) throws IllegalArgumentException, AmbiguousNickException, IOException {
-        /*
-        if (nicks.length < 2 || nicks.length > 4) {
-            throw new IllegalArgumentException("Number of players cannot be " + nicks.length);
-        }
-        // check if nicks are unique
-        if (new HashSet<>(Arrays.asList(nicks)).toArray().length != nicks.length) {
-            throw new AmbiguousNickException("Nicks must be unique!");
+    /**
+     *
+     * @param numberOfPlayers
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IOException
+     */
+    public static ServerBoard generateRandomServerBoard(int numberOfPlayers) throws IllegalArgumentException, IOException {
+        if (numberOfPlayers < 2 || numberOfPlayers > 4) {
+            throw new IllegalArgumentException("Number of players cannot be " + numberOfPlayers);
         }
 
-         */
-
-        //int numberOfPlayers = nicks.length;
         Rules gameRules = new Rules(numberOfPlayers);
         DeckMaker deckMaker = DeckMaker.getInstance();
         ServerBoard serverBoard = ServerBoard.getInstance();
 
         serverBoard.setRules(gameRules);
-        serverBoard.setBankCash(gameRules.startingBankCash());
-        /*
-        try {
-            serverBoard.setPlayers(makePlayers(nicks));
-
-
-        } // never thrown in that situation
-        */
-        //serverBoard.setActivePlayer(nicks[0]);
+        serverBoard.setBankCash(startingBankCash(numberOfPlayers));
 
         Stack<DevelopmentCard>[] cardStacks = deckMaker.makeDevelopmentCardsStacks();
         serverBoard.setDevelopmentCardPileLevel1(cardStacks[0]);
@@ -58,16 +45,6 @@ public class    BoardMaker {
         Noble[] nobles = deckMaker.makeNobles(gameRules.startingNumberOfNoblesOnBoard);
         serverBoard.setNobles(new NoblesOnBoard(nobles));
         return serverBoard;
-    }
-
-    private static HashMap<String, Player> makePlayers(String[] nicks) {
-        HashMap<String, Player> players = new HashMap<>();
-        boolean active = true;
-        for (String nick : nicks) {
-            players.put(nick, new Player(active, nick));
-            active = false;
-        }
-        return players;
     }
 
     public static ClientBoard generatePresentationBoard() throws InactivePlayersException {
@@ -104,6 +81,22 @@ public class    BoardMaker {
 
     private static BankCash generatePresentationBankCash() {
         return new BankCash(5, 8, 5, 8, 5, 3);
+    }
+
+    /**
+     * Create starting cash in bank from number of players
+     * @return BankCash object
+     */
+    public static BankCash startingBankCash(int numberOfPlayers) {
+        if (numberOfPlayers == 2) {
+            return new BankCash(4, 4, 4, 4, 4, 6);
+        }
+        if (numberOfPlayers == 3) {
+            return new BankCash(5, 5, 5, 5, 5, 6);
+        }
+        else {
+            return new BankCash(6, 6, 6, 6, 6, 6);
+        }
     }
 
     private static HashMap<String, Player> generatePresentationPlayers() {
