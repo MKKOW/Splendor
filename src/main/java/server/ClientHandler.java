@@ -2,6 +2,8 @@ package server;
 
 
 import Exceptions.InactivePlayersException;
+import Exceptions.NobleNotSelectedException;
+import Exceptions.TooMuchCashException;
 import Model.ClientBoard;
 import Model.Player;
 import Model.ServerBoard;
@@ -145,7 +147,7 @@ public class ClientHandler implements Runnable {
      * Starts the game and sends to clients info about the board
      * @throws IOException
      */
-    private void gameStart() throws IOException, InactivePlayersException {
+    private void gameStart() throws IOException, InactivePlayersException, TooMuchCashException, NobleNotSelectedException {
 
         ObjectMapper mapper=new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
@@ -190,6 +192,7 @@ public class ClientHandler implements Runnable {
                         .toString();
                 outputStream.writeObject(response);
                 outputStream.flush();
+                break;
             case "claim_card":
                  response = new JSONObject()
                         .put("answer_type","move_verification")
@@ -197,6 +200,7 @@ public class ClientHandler implements Runnable {
                         .toString();
                 outputStream.writeObject(response);
                 outputStream.flush();
+                break;
             case "buy_card":
                 response = new JSONObject()
                         .put("answer_type","move_verification")
@@ -204,7 +208,7 @@ public class ClientHandler implements Runnable {
                         .toString();
                 outputStream.writeObject(response);
                 outputStream.flush();
-
+                break;
         }
 
 
@@ -229,7 +233,7 @@ public class ClientHandler implements Runnable {
 
 
     }
-    private synchronized void increment() throws IOException, ClassNotFoundException, InterruptedException {
+    private synchronized void increment() throws IOException, ClassNotFoundException, InterruptedException, TooMuchCashException, NobleNotSelectedException {
         server.turn = (server.turn + 1)%server.playersNumber;
         System.out.println(server.turn);
         ServerBoard.getInstance().setActivePlayer(server.playersnicks.get(server.turn));
@@ -273,11 +277,14 @@ public class ClientHandler implements Runnable {
                 e.printStackTrace();
                 break;
 
+            } catch (TooMuchCashException | NobleNotSelectedException e) {
+                e.printStackTrace();
+
+
             }
 
-
         }
-
     }
 }
+
 

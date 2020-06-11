@@ -1,6 +1,8 @@
 package server;
 
 import Exceptions.InactivePlayersException;
+import Exceptions.NobleNotSelectedException;
+import Exceptions.TooMuchCashException;
 import Model.*;
 import client.Card;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -171,7 +173,7 @@ public class Client {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void gameStart() throws IOException, ClassNotFoundException, InactivePlayersException {
+    public void gameStart() throws IOException, ClassNotFoundException, InactivePlayersException, TooMuchCashException, NobleNotSelectedException {
 
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
@@ -394,14 +396,17 @@ public class Client {
         move = scn.nextInt();
             switch (move){
                 case 1:{
+                    System.out.println("Karta");
                     buycard();
                     break;
                 }
                 case 2:{
+                    System.out.println("Rezerwacja");
                     reservecard();
                     break;
                 }
                 case 3:{
+                    System.out.println("Klejnoty");
                     getgems();
                     break;
                 }
@@ -413,7 +418,7 @@ public class Client {
         }
 
     }
-    private void await() throws InterruptedException, IOException, ClassNotFoundException {
+    private void await() throws InterruptedException, IOException, ClassNotFoundException, TooMuchCashException, NobleNotSelectedException {
                 String input ="";
                 input = (String) inputStream.readObject();
                 //input2 = (String) inputStream.readObject();
@@ -447,7 +452,7 @@ public class Client {
 
                     }
 
-            } catch (IOException | ClassNotFoundException | InactivePlayersException | InterruptedException ex) {
+            } catch (IOException | ClassNotFoundException | InactivePlayersException | InterruptedException | TooMuchCashException | NobleNotSelectedException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }

@@ -45,7 +45,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
      * To get instance use ServerBoard.getInstance()
      * For making server board check BoardMaker class
      */
-    private ServerBoard() {
+    public ServerBoard() {
         super();
         developmentCardPileLevel1 = new Stack<>();
         developmentCardPileLevel2 = new Stack<>();
