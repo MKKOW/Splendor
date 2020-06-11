@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static java.lang.Thread.sleep;
+
 public class Client {
     /**
      * Default port to create client socket
@@ -201,6 +203,7 @@ public class Client {
                     cost,
                     jsonLord.getInt("prestige"));
             noblesArr[i] = noble;
+           // serverBoard.setPlayers();
         }
 
         serverBoard.setNobles(new NoblesOnBoard(noblesArr));
@@ -257,7 +260,7 @@ public class Client {
         //startGame();
     }
      */
-    private void buycard() throws IOException {
+    private void buycard() throws IOException, ClassNotFoundException {
         String place;
         int id;
         Scanner scn = new Scanner(System.in);
@@ -278,9 +281,11 @@ public class Client {
         System.out.println(jsonString);
         outputStream.writeObject(jsonString);
         outputStream.flush();
-        scn.close();
+        String input = (String) inputStream.readObject();
+        System.out.println(input);
+
     }
-    private void reservecard() throws IOException {
+    private void reservecard() throws IOException, ClassNotFoundException {
         int id;
         Scanner scn = new Scanner(System.in);
         System.out.println("opcje rezerwacja");
@@ -297,9 +302,11 @@ public class Client {
         System.out.println(jsonString);
         outputStream.writeObject(jsonString);
         outputStream.flush();
-        scn.close();
+        String input = (String) inputStream.readObject();
+        System.out.println(input);
+
     }
-    private void getgems() throws IOException {
+    private void getgems() throws IOException, ClassNotFoundException {
         int move;
         int[] gems = new int[5];
         int sum = 0;
@@ -311,7 +318,7 @@ public class Client {
             case 1: {
                 while(sum!=4) {
                     sum = 0;
-                    System.out.println("asfjsidf");
+                    System.out.println("Weź 2 klejnoty z dwóch róźnych stosów");
                     for (int i = 0; i < gems.length; i++) {
                         gems[i] = scn.nextInt();
                         while (gems[i] != 2 && gems[i] != 0) {
@@ -333,6 +340,8 @@ public class Client {
                 System.out.println(jsonString);
                 outputStream.writeObject(jsonString);
                 outputStream.flush();
+                String input = (String) inputStream.readObject();
+                System.out.println(input);
                 break;
             }
 
@@ -341,7 +350,7 @@ public class Client {
             case 2:{
                 while(sum!=3) {
                     sum =0;
-                    System.out.println("asfjsidf");
+                    System.out.println("Weź 3 klejnoty z trzech róźnych stosów");
                     for (int i = 0; i < gems.length; i++) {
                         gems[i] = scn.nextInt();
                         while (gems[i] != 1 && gems[i] != 0) {
@@ -363,18 +372,20 @@ public class Client {
                 System.out.println(jsonString);
                 outputStream.writeObject(jsonString);
                 outputStream.flush();
+                String input = (String) inputStream.readObject();
+                System.out.println(input);
                 break;
 
             }
             default:
-                System.out.println("cos");
+                System.out.println("zły input");
                 break;
         }
-        scn.close();
+
 
     }
 
-    private void playermove() throws IOException {
+    private void playermove() throws IOException, ClassNotFoundException {
         boolean player = true;
         while(player){
         int move;
@@ -395,17 +406,22 @@ public class Client {
                     break;
                 }
                 default:
-                    System.out.println("cos");
+                    System.out.println("zły input");
                     break;
             }
             player = false;
         }
 
     }
-    private void await() throws InterruptedException {
-
-        System.out.println("koncze ruch");
-
+    private void await() throws InterruptedException, IOException, ClassNotFoundException {
+                String input ="";
+                input = (String) inputStream.readObject();
+                //input2 = (String) inputStream.readObject();
+                System.out.println(input);
+                JSONObject jsonObject = new JSONObject(input);
+                ClientBoard.getInstance().setActivePlayer(jsonObject.getString("player"));
+                System.out.println(ClientBoard.getInstance().getActivePlayer());
+                System.out.println("nowa tura");
     }
     /**
      * Starts client and connects to server
@@ -417,18 +433,21 @@ public class Client {
                 System.out.println("Starting Splendor client...\nServer address: " + host + "\nServer port: " + serverPort);
                 inputStream = new ObjectInputStream(clientSocket.getInputStream());
                 outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                while (true) {
                     getserverHello();
                     sayHello();
                     gameStart();
-                    System.out.println(ClientBoard.getInstance().toString());
-                    System.out.println(board.getActivePlayer());
+                    while (true) {
+                        System.out.println(ClientBoard.getInstance().toString());
+                        System.out.println(ClientBoard.getInstance().getActivePlayer());
+                        if(ClientBoard.getInstance().getActivePlayer().getNick().equals(nick)) {
+                            playermove();
+                        }
+                        await();
 
-                    playermove();
-                    await();
-                    // for tests: receive, modify and send object (card)
-                }
-            } catch (IOException | ClassNotFoundException | InterruptedException | InactivePlayersException ex) {
+
+                    }
+
+            } catch (IOException | ClassNotFoundException | InactivePlayersException | InterruptedException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }

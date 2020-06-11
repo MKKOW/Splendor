@@ -3,6 +3,7 @@ package server;
 
 import Exceptions.AmbiguousNickException;
 import Exceptions.InactivePlayersException;
+import Model.Player;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,6 +12,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
     /**
@@ -38,7 +43,7 @@ public class Server {
      * Client's socket
      */
     private Socket clientsocket;
-    private Thread thread;
+    //private Thread thread;
     /**
      * HashMap storing player's id with their nicknames
      */
@@ -46,7 +51,7 @@ public class Server {
     /**
      * Number of players
      */
-    private final int playersNumber;
+    public final int playersNumber;
     /**
      * List of players' nicknames
      */
@@ -55,8 +60,9 @@ public class Server {
      * Instance of game's board
      */
     public Model.ServerBoard board;
-    public static int turn=0;
-
+    public int turn=0;
+    HashMap<String, Player>  playerHashMap = new HashMap<>();
+    final BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<String>();
     /**
      * Server constructor
      * @param serverport server port to run
@@ -92,10 +98,8 @@ public class Server {
                 clientsocket = socket.accept();
                 outputStream = new ObjectOutputStream(clientsocket.getOutputStream());
                 inputStream = new ObjectInputStream(clientsocket.getInputStream());
-                thread = new ClientHandler(outputStream,inputStream,clientsocket,playersNumber,this,board,hashMap);
-                System.out.println(thread.getName());
-                thread.setName(String.valueOf(i));
-                thread.start();
+                Runnable clientHandler = new ClientHandler(outputStream,inputStream,clientsocket,this);
+                new Thread(clientHandler).start();
                 }
 
             } catch (IOException | AmbiguousNickException e) {
