@@ -1,5 +1,8 @@
 package Model;
 
+import Exceptions.NobleNotSelectedException;
+import Exceptions.TooMuchCashException;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
@@ -102,7 +105,7 @@ public class ClientBoard implements Serializable {
     public NoblesOnBoard getNobles() {
         return nobles;
     }
-    public void setActivePlayer(String nick) {
+    public void setActivePlayer(String nick) throws TooMuchCashException, NobleNotSelectedException {
         this.activePlayer = players.get(nick);
     }
 

@@ -102,7 +102,7 @@ public class Server {
                 new Thread(clientHandler).start();
                 }
 
-            } catch (IOException | AmbiguousNickException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 closeConnection();
             }
