@@ -1,8 +1,11 @@
 package server;
 
 
+import Exceptions.InactivePlayersException;
 import Model.ClientBoard;
+import Model.Player;
 import Model.ServerBoard;
+import client.player;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,8 +16,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
 
-public class ClientHandler extends  Thread{
+import static java.lang.Thread.sleep;
+
+public class ClientHandler implements Runnable {
     /**
      * Data output
      */
@@ -30,39 +36,36 @@ public class ClientHandler extends  Thread{
     /**
      * Number of players in the game
      */
-    final int playernumber;
     /**
      * // TODO: change to board
      */
-    final ServerBoard board;
+    private Player player;
+
     /**
      * HashMap storing player's id with their nicknames
      */
-    final HashMap<String,String> hashMap;
     /**
      * Server in the game
      */
-    private final Server server;
+    final Server server;
     //private int turn;
+    private ClientBoard  clientBoard;
+
+
 
     /**
      * ClientHandler constructor
      * @param outputStream data output
      * @param inputStream data input
      * @param socket client's socket
-     * @param playernumber number of players in the game
      * @param server game server
-     * @param board
-     * @param hashMap map with nicks and ids
      */
-    public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, int playernumber, Server server, ServerBoard board, HashMap<String,String> hashMap) {
+    public ClientHandler(ObjectOutputStream outputStream, ObjectInputStream inputStream, Socket socket, Server server) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.socket = socket;
-        this.playernumber = playernumber;
         this.server = server;
-        this.board = board;
-        this.hashMap = hashMap;
+
     }
     /*
     public void sendClientMessage(String msg) {
@@ -86,7 +89,7 @@ public class ClientHandler extends  Thread{
                     .put("answer_type","server_hello")
                     .put("set_client_id", UUID.randomUUID().toString())
                     .put("number_of_players",server.playersnicks.size())
-                    .put("connected_players",playernumber)
+                    .put("connected_players",server.playersnicks)
                     .put("nicknames",server.playersnicks.toString())
                     .toString();
             outputStream.writeObject(jsonString);
@@ -112,9 +115,9 @@ public class ClientHandler extends  Thread{
                     .put("answer_type","nick_verification")
                     .put("result","invalid")
                     .put("number_of_players",server.playersnicks.size())
-                    .put("connected_players",playernumber)
+                    .put("connected_players",server.playersNumber)
                     .put("nicknames",server.playersnicks.toString())
-                    .put("message","Twój nick jest zły xd")
+                    .put("message","Twój nick jest zły")
                     .toString();
             outputStream.writeObject(response);
             outputStream.flush();
@@ -125,13 +128,15 @@ public class ClientHandler extends  Thread{
                     .put("answer_type","nick_verification")
                     .put("result","ok")
                     .put("number_of_players",server.playersnicks.size())
-                    .put("connected_players",playernumber)
+                    .put("connected_players",server.playersNumber)
                     .put("nicknames",server.playersnicks.toString())
                     .toString();
         outputStream.writeObject(response);
         outputStream.flush();
         //System.out.println(jsonObject.toString());
+        player = new Player(false,jsonObject.getString("set_nick"));
         server.playersnicks.add(jsonObject.getString("set_nick"));
+        server.playerHashMap.put(jsonObject.getString("set_nick"),player);
         server.hashMap.put(jsonObject.getString("set_nick"),jsonObject.getString("client_id"));
         System.out.println(server.playersnicks.toString());
     }
@@ -140,12 +145,15 @@ public class ClientHandler extends  Thread{
      * Starts the game and sends to clients info about the board
      * @throws IOException
      */
-    private void gameStart() throws IOException {
+    private void gameStart() throws IOException, InactivePlayersException {
 
         ObjectMapper mapper=new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        //board.setActivePlayer(server.playersnicks.get(0));
-        String jsonBoard =mapper.writeValueAsString(board);
+
+        server.board.setPlayers(server.playerHashMap);
+        server.board.setActivePlayer(server.playersnicks.get(0));
+        ClientBoard.setInstanceFromServerBoard(server.board);
+        String jsonBoard = mapper.writeValueAsString(ClientBoard.getInstance());
         String response = new JSONObject()
                     .put("answer_type","game_start")
                     .put("nicknames",server.playersnicks.toString())
@@ -156,16 +164,77 @@ public class ClientHandler extends  Thread{
         outputStream.writeObject(response);
         outputStream.flush();
     }
-    private void increment () {
-        Server.turn = (Server.turn + 1)%playernumber;
-    }
 
+/*
     private void play () {
         currentThread().setName(server.playersnicks.get(Server.turn));
         while(currentThread().getName().equals(String.valueOf(Server.turn))) {
 
 
         }
+
+
+
+    }
+ */
+    private void turn() throws IOException, ClassNotFoundException, InterruptedException {
+        String input = (String) inputStream.readObject();
+        JSONObject jsonObject = new JSONObject(input);
+        String response;
+        String request = jsonObject.getString("request_type");
+        switch (request) {
+            case "get_gems":
+                 response = new JSONObject()
+                        .put("answer_type","move_verification")
+                        .put("result","ok")
+                        .toString();
+                outputStream.writeObject(response);
+                outputStream.flush();
+            case "claim_card":
+                 response = new JSONObject()
+                        .put("answer_type","move_verification")
+                        .put("result","ok")
+                        .toString();
+                outputStream.writeObject(response);
+                outputStream.flush();
+            case "buy_card":
+                response = new JSONObject()
+                        .put("answer_type","move_verification")
+                        .put("result","ok")
+                        .toString();
+                outputStream.writeObject(response);
+                outputStream.flush();
+
+        }
+
+
+    }
+    private synchronized void updategame() throws IOException, ClassNotFoundException, InterruptedException {
+        String response = new JSONObject()
+                .put("answer_type", "game_board")
+                .put("next_player", server.playersnicks.get((server.turn + 1) % server.playersNumber))
+                .put("player", ServerBoard.getInstance().getActivePlayer().getNick())
+                .toString();
+        server.blockingQueue.clear();
+        for(int i =0;i<server.playersNumber;i++) {
+            server.blockingQueue.put(response);
+        }
+
+    }
+    private synchronized void sendgame() throws InterruptedException, IOException {
+
+        String response = server.blockingQueue.take();
+        outputStream.writeObject(response);
+        outputStream.flush();
+
+
+    }
+    private synchronized void increment() throws IOException, ClassNotFoundException, InterruptedException {
+        server.turn = (server.turn + 1)%server.playersNumber;
+        System.out.println(server.turn);
+        ServerBoard.getInstance().setActivePlayer(server.playersnicks.get(server.turn));
+        System.out.println(ServerBoard.getInstance().getActivePlayer());
+        updategame();
     }
     @Override
     public void run() {
@@ -174,7 +243,7 @@ public class ClientHandler extends  Thread{
                 sayHello();
                 checkClientnick();
                 synchronized (server){
-                    if(server.playersnicks.size()==playernumber){
+                    if(server.playersnicks.size()==server.playersNumber){
                         server.notifyAll();
                     }
                     else{
@@ -183,13 +252,26 @@ public class ClientHandler extends  Thread{
 
                 }
                 gameStart();
-                //verifymove();
+                while (true){
+                       // synchronized (server) {
+                            if (server.board.getActivePlayer().getNick().equals(player.getNick())) {
+                                turn();
+                                increment();
+                                //updategame();
+                               // server.notifyAll();
+                            //}
+                           // else {
+                              //  server.wait();
+                           // }
 
-
-                Thread.sleep(100000000);
+                        }
+                        System.out.println("sending data");
+                        sendgame();
+                }
             }
-            catch (InterruptedException | IOException | ClassNotFoundException e) {
+            catch (InterruptedException | IOException | ClassNotFoundException | InactivePlayersException e) {
                 e.printStackTrace();
+                break;
 
             }
 
