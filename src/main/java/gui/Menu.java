@@ -58,11 +58,8 @@ public class Menu{
                 try {
                     ClientBoard clientBoard= BoardMaker.generatePresentationBoard();
                     view.setVisible(false);
-                    ObjectMapper mapper=new ObjectMapper();
-                    String json =mapper.writeValueAsString(clientBoard);
-                    JSONObject board=new JSONObject(json);
-                    frame.setContentPane(new Game(frame,board));
-                } catch (IOException | InactivePlayersException inactivePlayersException) {
+                    frame.setContentPane(new Connect(frame));
+                } catch (InactivePlayersException inactivePlayersException) {
                     inactivePlayersException.printStackTrace();
                 }
 

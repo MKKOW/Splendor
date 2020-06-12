@@ -1,13 +1,15 @@
 package gui;
 
+import Controller.BoardMaker;
+import Exceptions.InactivePlayersException;
+import Model.ClientBoard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 public class Game extends JPanel {
     private Card[][] cards;
@@ -21,8 +23,13 @@ public class Game extends JPanel {
     private int Height;
     private int x;
     private int y;
-    public Game(JFrame frame, JSONObject board) throws JsonProcessingException {
+    private String nick;
+    private JButton claimCard;
+    private JButton buyCard;
+    private JButton getGems;
+    public Game(JFrame frame, JSONObject board, String localNick) throws JsonProcessingException {
         super(null);
+        nick = localNick;
         setBackground(Color.BLACK);
         cards=new Card[4][5];
         players=new Card[4];
@@ -117,6 +124,7 @@ public class Game extends JPanel {
                 frame.setContentPane(new Menu(frame).view);
             }
         });
+        System.out.println(board);
     }
     void makePlayer(int id,JSONObject player){
         int[] cost=new int[6];
@@ -145,21 +153,210 @@ public class Game extends JPanel {
         int points=0;
         players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],discount[5],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
         add(players[id]);
-        players[id].setSize(cardWidth,cardHeight);
         players[id].forceVisible();
+        JSONObject claimedCardJSON = null;
+        try {//Nothing else worked
+            claimedCardJSON = player.getJSONObject("claimedCard");
+        }
+        catch (Exception ignored){
+
+        }
+        Card claimedCard = null;
         switch (id) {
             case 0:
-                players[id].setLocation((Width - cardWidth)/2, Height - cardHeight);
+                players[id].setLocation(x, y+cardHeight*4);
+                players[id].setSize(cardWidth*5,cardHeight);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
                 break;
             case 1:
-                players[id].setLocation(Width - cardWidth, (Height-cardHeight)/2);
+                players[id].setLocation(Width-cardWidth, y);
+                players[id].setSize(cardWidth,cardHeight*4);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
                 break;
             case 2:
-                players[id].setLocation((Width-cardWidth)/2, 0);
+                players[id].setLocation(x, 0);
+                players[id].setSize(cardWidth*5,cardHeight);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
                 break;
             case 3:
-                players[id].setLocation(0, (Height-cardHeight) /2);
+                players[id].setLocation(0, y);
+                players[id].setSize(cardWidth,cardHeight*4);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
                 break;
         }
+        if(nick.equals(player.getString("nick")))
+            addButtons(claimedCard);
+    }
+    private void addButtons(Card claimedCard){
+            buyCard = new JButton("Buy card");
+            claimCard = new JButton("Claim card");
+            getGems = new JButton("Get gems");
+            buyCard.setLocation(0,y+cardHeight*4);
+            claimCard.setLocation(x/3,y+cardHeight*4);
+            getGems.setLocation(x*2/3,y+cardHeight*4);
+            buyCard.setSize(x/3,cardHeight);
+            claimCard.setSize(x/3,cardHeight);
+            getGems.setSize(x/3,cardHeight);
+            add(buyCard);
+            add(claimCard);
+            add(getGems);
+            buyCard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i= 1; i<=3;i++){
+                    for(int j=1;j<=4;j++){
+                        Card card=cards[i][j];
+                        if(card!=null){
+                            card.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mousePressed(MouseEvent e) {
+                                    card.setVisible(false);
+                                    for(int i2= 1; i2<=3;i2++) {
+                                        for (int j2 = 1; j2 <= 4; j2++) {
+                                            Card card2=cards[i2][j2];
+                                            card2.removeMouseListener(card2.getMouseListeners()[0]);
+                                        }
+                                    }
+                                    if(claimedCard!= null)
+                                        claimedCard.removeMouseListener(claimedCard.getMouseListeners()[0]);
+                                    parseBuy(claimedCard.getId(),"table");
+                                }
+                            });
+                        }
+                    }
+                }
+                if(claimedCard!=null){
+                    claimedCard.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            claimedCard.setVisible(false);
+                            for(int i2= 1; i2<=3;i2++) {
+                                for (int j2 = 1; j2 <= 4; j2++) {
+                                    Card card2=cards[i2][j2];
+                                    card2.removeMouseListener(card2.getMouseListeners()[0]);
+                                }
+                            }
+                            parseBuy(claimedCard.getId(),"hand");
+                        }
+                    });
+                }
+            }
+        });
+        claimCard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i= 0; i<=3;i++){
+                    for(int j= 0;j<=4;j++){
+                        Card card=cards[i][j];
+                        if(card!=null){
+                            card.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mousePressed(MouseEvent e) {
+                                    card.setVisible(false);
+                                    for(int i2= 1; i2<=3;i2++) {
+                                        for (int j2 = 1; j2 <= 4; j2++) {
+                                            Card card2=cards[i2][j2];
+                                            if(card2!=null)
+                                                card2.removeMouseListener(card2.getMouseListeners()[0]);
+                                        }
+                                    }
+                                    parseClaim(card.getId());
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+        getGems.addActionListener(new ActionListener() {
+            int[] table = new int[5];
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i=0;i<5;i++){
+                    coinStack stack=coinStacks[i];
+                    int finalI = i;
+                    stack.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            if(checkTable(table,finalI)){
+                                table[finalI]++;
+                                stack.setAmount(stack.getAmount()-1);
+                                if(checkFinish(table)) {
+                                    for(int i=0;i<5;i++) {
+                                        coinStack stack = coinStacks[i];
+                                        stack.removeMouseListener(stack.getMouseListeners()[0]);
+                                    }
+                                    parseGetGem(table);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+    private boolean checkFinish(int[] table) {
+        int count_single=0;
+        for(int i=0;i<table.length;i++){
+            if(table[i]==2)
+                return true;
+            if(table[i]==1)
+                count_single++;
+        }
+        if(count_single==3){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkTable(int[] table, int finalI) {
+        if(table[finalI]==1) {
+            for (int i = 0; i < table.length; i++) {
+                if(i!=finalI&&table[i]==1){
+                    return false;
+                }
+            }
+            return true;
+        }else{
+            return true;
+        }
+    }
+    private void parseGetGem(int[] table) {
+        JSONObject request=new JSONObject();
+        request.put("request_type","claim_card");
+        request.put("white",table[0]);
+        request.put("blue",table[1]);
+        request.put("green",table[2]);
+        request.put("red",table[3]);
+        request.put("black",table[4]);
+        System.out.println(request);
+    }
+    private void parseClaim(int id) {
+        JSONObject request=new JSONObject();
+        request.put("request_type","claim_card");
+        request.put("card_id",id);
+        System.out.println(request);
+    }
+
+    private void parseBuy(int id,String place) {
+        JSONObject request=new JSONObject();
+        request.put("request_type","buy_card");
+        request.put("place",place);
+        request.put("card_id",id);
+        System.out.println(request);
     }
 }

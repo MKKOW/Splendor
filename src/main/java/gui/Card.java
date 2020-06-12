@@ -38,7 +38,7 @@ public class Card extends JPanel{
                 noble?0:card.getJSONObject("discount").getInt("red"),
                 noble?0:card.getJSONObject("discount").getInt("black"),
                 0,
-                noble?0:card.getInt("prestige"),
+                card.getInt("prestige"),
                 noble,
                 width,
                 height,
@@ -104,7 +104,7 @@ public class Card extends JPanel{
         add(textField);
         textField.setSize(stackWidth*5,stackHeight);
         textField.setLocation(stackWidth,stackHeight);
-        if(!noble) {
+        /*if(!noble) {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -129,6 +129,7 @@ public class Card extends JPanel{
                 }
             });
         }
+        */
     }
 
     public void setPoints(int points){
@@ -183,5 +184,9 @@ public class Card extends JPanel{
             add(pointsField);
             pointsField.setSize(stackWidth,stackHeight);
             pointsField.setLocation(0,0);
+    }
+
+    public int getId() {
+        return id;
     }
 }
