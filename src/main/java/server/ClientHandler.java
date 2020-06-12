@@ -1,13 +1,8 @@
 package server;
 
 
-import Exceptions.InactivePlayersException;
-import Exceptions.NobleNotSelectedException;
-import Exceptions.TooMuchCashException;
-import Model.ClientBoard;
-import Model.Player;
-import Model.ServerBoard;
-import client.player;
+import Exceptions.*;
+import Model.*;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,9 +11,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
 
 import static java.lang.Thread.sleep;
 
@@ -39,7 +33,7 @@ public class ClientHandler implements Runnable {
      * Number of players in the game
      */
     /**
-     * // TODO: change to board
+     * Server board
      */
     private Player player;
 
@@ -152,16 +146,15 @@ public class ClientHandler implements Runnable {
         ObjectMapper mapper=new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-        server.board.setPlayers(server.playerHashMap);
-        server.board.setActivePlayer(server.playersnicks.get(0));
-        ClientBoard.setInstanceFromServerBoard(server.board);
+        server.serverBoard.setPlayers(server.playerHashMap);
+        server.serverBoard.setActivePlayer(server.playersnicks.get(0));
+        ClientBoard.setInstanceFromServerBoard(server.serverBoard);
         String jsonBoard = mapper.writeValueAsString(ClientBoard.getInstance());
         String response = new JSONObject()
                     .put("answer_type","game_start")
                     .put("nicknames",server.playersnicks.toString())
                     .put("Board",jsonBoard)
                     .toString();
-
 
         outputStream.writeObject(response);
         outputStream.flush();
@@ -172,53 +165,128 @@ public class ClientHandler implements Runnable {
         currentThread().setName(server.playersnicks.get(Server.turn));
         while(currentThread().getName().equals(String.valueOf(Server.turn))) {
 
-
         }
-
-
-
     }
  */
-    private void turn() throws IOException, ClassNotFoundException, InterruptedException {
-        String input = (String) inputStream.readObject();
-        JSONObject jsonObject = new JSONObject(input);
-        String response;
+    private void sendResponse(String answerType, String result, String message, int[] nobles) throws IOException {
+        String response="";
+        switch (answerType) {
+            case "move_verification": {
+                if(message==null) {
+                    response = new JSONObject()
+                            .put("answer_type", answerType)
+                            .put("result", result)
+                            .toString();
+                }
+                else {
+                    response = new JSONObject()
+                            .put("answer_type", answerType)
+                            .put("result", result)
+                            .put("message", message)
+                            .toString();
+                }
+                break;
+            }
+            case "end_of_round" : {
+                if(result.equals("select_noble")) {
+                    response = new JSONObject()
+                            .put("answer_type", answerType)
+                            .put("result", result)
+                            .put("nobles", Arrays.toString(nobles))
+                            .toString();
+                }
+                else {
+                    response = new JSONObject()
+                            .put("answer_type", answerType)
+                            .put("result", result)
+                            .toString();
+                }
+                break;
+            }
+
+        }
+        outputStream.writeObject(response);
+        outputStream.flush();
+    }
+
+    private void verifyMove(JSONObject jsonObject) throws IOException{
         String request = jsonObject.getString("request_type");
         switch (request) {
-            case "get_gems":
-                 response = new JSONObject()
-                        .put("answer_type","move_verification")
-                        .put("result","ok")
-                        .toString();
-                outputStream.writeObject(response);
-                outputStream.flush();
+            case "get_gems": {
+                try {
+                    ServerBoard.getInstance().giveCash(jsonObject.getInt("white"),
+                            jsonObject.getInt("green"),
+                            jsonObject.getInt("blue"),
+                            jsonObject.getInt("black"),
+                            jsonObject.getInt("red"));
+                    sendResponse("move_verification","ok", null, null);
+                } catch (NotEnoughCashException | IllegalCashAmountException e) {
+                    sendResponse("move_verification", "illegal", e.getMessage(), null);
+                }
                 break;
-            case "claim_card":
-                 response = new JSONObject()
-                        .put("answer_type","move_verification")
-                        .put("result","ok")
-                        .toString();
-                outputStream.writeObject(response);
-                outputStream.flush();
+            }
+            case "claim_card": {
+                try {
+                    ServerBoard.getInstance().claimCard(jsonObject.getInt("card_id"));
+                    sendResponse("move_verification", "ok", null, null);
+                } catch (IllegalArgumentException | CardNotOnBoardException | TooManyClaimsException e) {
+                    sendResponse("move_verification", "illegal", e.getMessage(), null);
+                }
                 break;
-            case "buy_card":
-                response = new JSONObject()
-                        .put("answer_type","move_verification")
-                        .put("result","ok")
-                        .toString();
-                outputStream.writeObject(response);
-                outputStream.flush();
+            }
+            case "buy_card": {
+                try {
+                    String place = jsonObject.getString("place");
+                    if(place.equals("hand"))
+                        ServerBoard.getInstance().buyClaimedCard();
+                    else
+                        ServerBoard.getInstance().buyCard(jsonObject.getInt("card_id"));
+                    sendResponse("move_verification", "ok", null, null);
+                } catch (NotEnoughCashException | NothingClaimedException | CardNotOnBoardException | IllegalArgumentException e) {
+                    sendResponse("move_verification", "illegal", e.getMessage(), null);
+                }
                 break;
+            }
+        }
+    }
+
+    private void endOfTurn() throws IOException {
+        String answer = "end_of_round";
+        int cashSum=ServerBoard.getInstance().getActivePlayer().getCash().getYellow() +
+                ServerBoard.getInstance().getActivePlayer().getCash().getBlack() +
+                ServerBoard.getInstance().getActivePlayer().getCash().getBlue() +
+                ServerBoard.getInstance().getActivePlayer().getCash().getGreen() +
+                ServerBoard.getInstance().getActivePlayer().getCash().getRed() +
+                ServerBoard.getInstance().getActivePlayer().getCash().getWhite();
+
+        if(cashSum> Rules.maxPlayerCash) {
+            sendResponse(answer, "discard_gems", null, null);
         }
 
-
+        if(ServerBoard.getInstance().getAvailableNoblesIDs().length == 0) {
+            sendResponse(answer, "ok", null, null);
+        }
+        else {
+            sendResponse(answer, "select_noble", null, ServerBoard.getInstance().getAvailableNoblesIDs());
+        }
     }
-    private synchronized void updategame() throws IOException, ClassNotFoundException, InterruptedException {
+    private void turn() throws IOException, ClassNotFoundException {
+        String input = (String) inputStream.readObject();
+        JSONObject jsonObject = new JSONObject(input);
+        verifyMove(jsonObject);
+    }
+    private synchronized void updategame() throws IOException, InterruptedException {
+        ObjectMapper mapper=new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        String jsonBoard = mapper.writeValueAsString(ClientBoard.getInstance());
+
         String response = new JSONObject()
                 .put("answer_type", "game_board")
                 .put("next_player", server.playersnicks.get((server.turn + 1) % server.playersNumber))
                 .put("player", ServerBoard.getInstance().getActivePlayer().getNick())
+                .put("Board",jsonBoard)
                 .toString();
+        System.out.println(jsonBoard);
         server.blockingQueue.clear();
         for(int i =0;i<server.playersNumber;i++) {
             server.blockingQueue.put(response);
@@ -258,9 +326,10 @@ public class ClientHandler implements Runnable {
                 gameStart();
                 while (true){
                        // synchronized (server) {
-                            if (server.board.getActivePlayer().getNick().equals(player.getNick())) {
+                            if (server.serverBoard.getActivePlayer().getNick().equals(player.getNick())) {
                                 turn();
                                 increment();
+                                endOfTurn();
                                 //updategame();
                                // server.notifyAll();
                             //}
