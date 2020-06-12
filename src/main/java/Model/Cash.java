@@ -31,7 +31,7 @@ public class Cash extends Cost implements Serializable {
      * @param yellow - number of yellow gems
      * @throws IllegalArgumentException - thrown when one or more arguments is negative
      */
-    Cash(int white, int green, int blue, int black, int red, int yellow) throws IllegalArgumentException {
+    public Cash(int white, int green, int blue, int black, int red, int yellow) throws IllegalArgumentException {
         super(white, green, blue, black, red);
         if (yellow < 0) throw new IllegalArgumentException("Yellow tokens cannot be negative");
         this.yellow = yellow;

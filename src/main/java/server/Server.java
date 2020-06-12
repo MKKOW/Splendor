@@ -1,9 +1,12 @@
 package server;
 
 
-import Exceptions.AmbiguousNickException;
-import Exceptions.InactivePlayersException;
+import Model.ClientBoard;
 import Model.Player;
+import Model.ServerBoard;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,9 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
@@ -59,10 +60,11 @@ public class Server {
     /**
      * Instance of game's board
      */
-    public Model.ServerBoard board;
+    public Model.ServerBoard serverBoard;
+    public Model.ClientBoard clientBoard;
     public int turn=0;
     HashMap<String, Player>  playerHashMap = new HashMap<>();
-    final BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<String>();
+    final BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
     /**
      * Server constructor
      * @param serverport server port to run
@@ -93,7 +95,9 @@ public class Server {
         try {
             socket = new ServerSocket(serverport);
             System.out.println("Starting Splendor server on port: " + serverport);
-            board = Controller.BoardMaker.generateRandomServerBoard(playersNumber);
+            serverBoard = Controller.BoardMaker.generateRandomServerBoard(playersNumber);
+
+            //ClientBoard.setInstanceFromServerBoard(serverBoard);
             for(int i = 0;i<playersNumber;i++) {
                 clientsocket = socket.accept();
                 outputStream = new ObjectOutputStream(clientsocket.getOutputStream());

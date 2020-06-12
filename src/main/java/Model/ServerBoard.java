@@ -126,7 +126,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
      * @throws NotEnoughCashException   - if player do not have enough cash to buy card
      * @throws IllegalArgumentException - if id is wrong
      */
-    void buyCard(int cardId) throws CardNotOnBoardException, NotEnoughCashException, IllegalArgumentException {
+    public void buyCard(int cardId) throws CardNotOnBoardException, NotEnoughCashException, IllegalArgumentException {
         if (cardId < 1 || cardId > Rules.maxDevelopmentCardLevel3Id)
             throw new IllegalArgumentException("Development card of id " + cardId + " does not exist");
 
@@ -148,7 +148,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
      * @throws NotEnoughCashException - if player do not have enough cash
      * @throws NothingClaimedException - if player fo not claims any card
      */
-    void buyClaimedCard() throws NotEnoughCashException, NothingClaimedException {
+    public void buyClaimedCard() throws NotEnoughCashException, NothingClaimedException {
         DevelopmentCard claimedCard = activePlayer.getClaimedCard();
         if (claimedCard == null) throw new NothingClaimedException("Player " + activePlayer.getNick() + " is not holding any card");
 
@@ -174,7 +174,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
      * @throws NotEnoughCashException     - if there isn't enough cash in the bank
      * @throws IllegalCashAmountException - if cash amount the player gets is against the rules
      */
-    void giveCash(int white, int green, int blue, int black, int red) throws NotEnoughCashException, IllegalCashAmountException {
+    public void giveCash(int white, int green, int blue, int black, int red) throws NotEnoughCashException, IllegalCashAmountException {
         Cash cash = new Cash(white, green, blue, black, red, 0);
         bankCash.subCash(cash);
         activePlayer.addCash(cash);
@@ -204,7 +204,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
      * @throws CardNotOnBoardException  - if development card isn't on board
      * @throws TooManyClaimsException   - if player already claims another card
      */
-    void claimCard(int cardId) throws IllegalArgumentException, CardNotOnBoardException, TooManyClaimsException {
+    public void claimCard(int cardId) throws IllegalArgumentException, CardNotOnBoardException, TooManyClaimsException {
         if (cardId < 0 || cardId > Rules.maxDevelopmentCardLevel3Id)
             throw new IllegalArgumentException("Development card of id " + cardId + " does not exist");
 
