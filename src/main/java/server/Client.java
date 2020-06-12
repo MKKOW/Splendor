@@ -23,7 +23,7 @@ import java.util.*;
 
 import static java.lang.Thread.sleep;
 
-public class Client {
+public class Client implements Runnable{
     /**
      * Default port to create client socket
      */
@@ -564,7 +564,8 @@ public class Client {
     /**
      * Starts client and connects to server
      */
-    public void runClient() {
+    @Override
+     public void run() {
             try {
                 InetAddress ip = InetAddress.getByName("localhost");
                 Socket clientSocket = new Socket(ip, serverPort);
@@ -594,12 +595,13 @@ public class Client {
     public static void main(String[] args){
         try{
             Client client = new Client(defaultPort,host);
-            client.runClient();
+            client.run();
         }
         catch (Exception e){
             e.printStackTrace();
         }
 
     }
+
 }
 
