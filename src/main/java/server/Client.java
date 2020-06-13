@@ -571,10 +571,16 @@ public class Client implements Runnable{
 
         return jsonInput;
     }
-    public JSONObject getResponse () {
+    public JSONObject getResponse () throws IOException, ClassNotFoundException {
+        String input = (String) inputStream.readObject();
+        JSONObject jsonObject = new JSONObject(input);
+        currentResponse = jsonObject;
         return currentResponse;
     }
-    public JSONObject getCurrentBoard ()  {
+    public JSONObject getCurrentBoard () throws IOException, ClassNotFoundException {
+        String input = (String) inputStream.readObject();
+        JSONObject jsonBoard = new JSONObject(input);
+        currentBoard = jsonBoard;
         return currentBoard;
     }
     /**
