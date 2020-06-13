@@ -582,7 +582,9 @@ public class Client implements Runnable{
      */
     @Override
      public void run() {
+        /**
             try {
+
                 InetAddress ip = InetAddress.getByName("localhost");
                 Socket clientSocket = new Socket(ip, serverPort);
                 System.out.println("Starting Splendor client...\nServer address: " + host + "\nServer port: " + serverPort);
@@ -602,10 +604,12 @@ public class Client implements Runnable{
 
                     }
 
+
             } catch (IOException | ClassNotFoundException | InactivePlayersException | TooMuchCashException | NobleNotSelectedException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }
+                 */
         }
 
     public static void main(String[] args){
