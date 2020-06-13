@@ -17,6 +17,7 @@ import java.lang.management.PlatformLoggingMXBean;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -63,6 +64,8 @@ public class Client implements Runnable{
     private String nick = "";
 
     private ClientBoard board;
+
+    private Queue<JSONObject> answers = new LinkedList<>();
 
     private final HashMap<String, Player> players = new HashMap<>();
     private JSONObject currentResponse = null;
@@ -163,8 +166,9 @@ public class Client implements Runnable{
             input = (String) inputStream.readObject();
             System.out.println(input);
             JSONObject jsonObject = new JSONObject(input);
-            currentResponse = jsonObject;
             setClientID(jsonObject.getString("set_client_id"));
+            answers.add(jsonObject);
+
             System.out.println(clientID);
             //tmp = jsonObject.getString("nicknames").split(",");
             nicknames = new ArrayList<>(Arrays.asList(jsonObject.getString("nicknames").replaceAll("(^\\[|\\]$)", "").split(", ")));
@@ -568,19 +572,18 @@ public class Client implements Runnable{
         outputStream.flush();
         String input = (String) inputStream.readObject();
         JSONObject jsonInput = new JSONObject(input);
-
+        answers.add(jsonInput);
         return jsonInput;
     }
-    public JSONObject getResponse () throws IOException, ClassNotFoundException {
-        String input = (String) inputStream.readObject();
-        JSONObject jsonObject = new JSONObject(input);
-        currentResponse = jsonObject;
+    public JSONObject getResponse () {
+        currentResponse = answers.remove();
         return currentResponse;
     }
     public JSONObject getCurrentBoard () throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
-        JSONObject jsonBoard = new JSONObject(input);
-        currentBoard = jsonBoard;
+        JSONObject jsonObject = new JSONObject(input);
+        String boardString = jsonObject.getString("Board");
+        currentBoard = new JSONObject(boardString);
         return currentBoard;
     }
     /**
@@ -616,7 +619,21 @@ public class Client implements Runnable{
                 ex.printStackTrace();
             }
                  */
+        InetAddress ip = null;
+        try {
+            ip = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
+        try {
+            Socket clientSocket = new Socket(ip, serverPort);
+            inputStream = new ObjectInputStream(clientSocket.getInputStream());
+            outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            getserverHello();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args){
         try{
