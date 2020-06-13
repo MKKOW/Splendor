@@ -17,6 +17,7 @@ import java.lang.management.PlatformLoggingMXBean;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -64,7 +65,11 @@ public class Client implements Runnable{
 
     private ClientBoard board;
 
-    private HashMap<String, Player> players = new HashMap<>();
+    private Queue<JSONObject> answers = new LinkedList<>();
+
+    private final HashMap<String, Player> players = new HashMap<>();
+    private JSONObject currentResponse = null;
+    private JSONObject currentBoard = null;
 
     /**
      * Gets client's nickname
@@ -125,12 +130,13 @@ public class Client implements Runnable{
 
         // Sending chosen nickname
         jsonObject = sendAndGetNick(input,jsonObject);
-
+        currentResponse = jsonObject;
         // Verification from server
         while (jsonObject.getString("result").equals("invalid")) {
             System.out.println(jsonObject.getString("message"));
             chooseNick();
             jsonObject = sendAndGetNick(input,jsonObject);
+            currentResponse = jsonObject;
         }
         if (jsonObject.getString("result").equals("ok"))
             System.out.println("dobre");
@@ -146,6 +152,7 @@ public class Client implements Runnable{
         outputStream.flush();
         input = (String) inputStream.readObject();
         jsonObject = new JSONObject(input);
+        currentResponse = jsonObject;
         return jsonObject;
 
     }
@@ -160,6 +167,8 @@ public class Client implements Runnable{
             System.out.println(input);
             JSONObject jsonObject = new JSONObject(input);
             setClientID(jsonObject.getString("set_client_id"));
+            answers.add(jsonObject);
+
             System.out.println(clientID);
             //tmp = jsonObject.getString("nicknames").split(",");
             nicknames = new ArrayList<>(Arrays.asList(jsonObject.getString("nicknames").replaceAll("(^\\[|\\]$)", "").split(", ")));
@@ -179,6 +188,7 @@ public class Client implements Runnable{
 
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
+        currentResponse = jsonObject;
         nicknames = new ArrayList<>(Arrays.asList(jsonObject.getString("nicknames").replaceAll("(^\\[|\\]$)", "").split(", ")));
         System.out.println(nicknames.toString());
        // System.out.println(jsonObject.getString("Board"));
@@ -191,6 +201,7 @@ public class Client implements Runnable{
         System.out.println(boardString);
 
         JSONObject boardJSON = new JSONObject(boardString);
+        currentBoard = boardJSON;
         serverBoard.setBankCash(new BankCash(boardJSON.getJSONObject("bankCash").getInt("white"),
                 boardJSON.getJSONObject("bankCash").getInt("green"),
                 boardJSON.getJSONObject("bankCash").getInt("blue"),
@@ -335,6 +346,7 @@ public class Client implements Runnable{
     private void updateGame() throws IOException, ClassNotFoundException, TooMuchCashException, NobleNotSelectedException {
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
+        currentBoard = jsonObject;
         getNewBoard(jsonObject, false);
         ClientBoard.getInstance().setActivePlayer(jsonObject.getString("player"));
     }
@@ -484,6 +496,7 @@ public class Client implements Runnable{
             }
             String input = (String) inputStream.readObject();
             JSONObject jsonObject = new JSONObject(input);
+            currentResponse = jsonObject;
             if(jsonObject.getString("result").equals("ok")) {
                 player = false;
                 endTurn();
@@ -559,14 +572,28 @@ public class Client implements Runnable{
         outputStream.flush();
         String input = (String) inputStream.readObject();
         JSONObject jsonInput = new JSONObject(input);
+        answers.add(jsonInput);
         return jsonInput;
+    }
+    public JSONObject getResponse () {
+        currentResponse = answers.remove();
+        return currentResponse;
+    }
+    public JSONObject getCurrentBoard () throws IOException, ClassNotFoundException {
+        String input = (String) inputStream.readObject();
+        JSONObject jsonObject = new JSONObject(input);
+        String boardString = jsonObject.getString("Board");
+        currentBoard = new JSONObject(boardString);
+        return currentBoard;
     }
     /**
      * Starts client and connects to server
      */
     @Override
      public void run() {
+        /**
             try {
+
                 InetAddress ip = InetAddress.getByName("localhost");
                 Socket clientSocket = new Socket(ip, serverPort);
                 System.out.println("Starting Splendor client...\nServer address: " + host + "\nServer port: " + serverPort);
@@ -586,11 +613,27 @@ public class Client implements Runnable{
 
                     }
 
+
             } catch (IOException | ClassNotFoundException | InactivePlayersException | TooMuchCashException | NobleNotSelectedException ex) {
                 //System.out.println("Dziękujemy za grę ^^");
                 ex.printStackTrace();
             }
+                 */
+        InetAddress ip = null;
+        try {
+            ip = InetAddress.getByName("localhost");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
+        try {
+            Socket clientSocket = new Socket(ip, serverPort);
+            inputStream = new ObjectInputStream(clientSocket.getInputStream());
+            outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            getserverHello();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args){
         try{

@@ -187,7 +187,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
      * @throws CardNotOnBoardException    - if noble card isn't on board
      * @throws NotEnoughDiscountException - if player don't have enough discount to get that noble
      */
-    void giveNoble(int nobleId) throws CardNotOnBoardException, NotEnoughDiscountException {
+    public void giveNoble(int nobleId) throws CardNotOnBoardException, NotEnoughDiscountException {
         if (nobleId < 0 || nobleId > Rules.maxNobleId)
             throw new IllegalArgumentException("Noble card of id " + nobleId + " does not exist");
 

@@ -46,7 +46,8 @@ public class ClientHandler implements Runnable {
     final Server server;
     //private int turn;
     private ClientBoard  clientBoard;
-
+    public String winner;
+    public boolean gameOver = false;
 
 
     /**
@@ -134,6 +135,7 @@ public class ClientHandler implements Runnable {
         server.playersnicks.add(jsonObject.getString("set_nick"));
         server.playerHashMap.put(jsonObject.getString("set_nick"),player);
         server.hashMap.put(jsonObject.getString("set_nick"),jsonObject.getString("client_id"));
+        //ServerBoard.getInstance().addPlayer(jsonObject.getString("set_nick")); TODO: Tak można było dodać playera :(
         System.out.println(server.playersnicks.toString());
     }
 
@@ -209,7 +211,8 @@ public class ClientHandler implements Runnable {
         outputStream.flush();
     }
 
-    private void verifyMove(JSONObject jsonObject) throws IOException{
+    private boolean verifyMove(JSONObject jsonObject) throws IOException{
+        boolean ok = true;
         String request = jsonObject.getString("request_type");
         switch (request) {
             case "get_gems": {
@@ -219,8 +222,10 @@ public class ClientHandler implements Runnable {
                             jsonObject.getInt("blue"),
                             jsonObject.getInt("black"),
                             jsonObject.getInt("red"));
+                    ServerBoard.getInstance().getActivePlayer().incrementNumberOfMoves();
                     sendResponse("move_verification","ok", null, null);
                 } catch (NotEnoughCashException | IllegalCashAmountException e) {
+                    ok = false;
                     sendResponse("move_verification", "illegal", e.getMessage(), null);
                 }
                 break;
@@ -228,8 +233,10 @@ public class ClientHandler implements Runnable {
             case "claim_card": {
                 try {
                     ServerBoard.getInstance().claimCard(jsonObject.getInt("card_id"));
+                    ServerBoard.getInstance().getActivePlayer().incrementNumberOfMoves();
                     sendResponse("move_verification", "ok", null, null);
                 } catch (IllegalArgumentException | CardNotOnBoardException | TooManyClaimsException e) {
+                    ok = false;
                     sendResponse("move_verification", "illegal", e.getMessage(), null);
                 }
                 break;
@@ -241,39 +248,70 @@ public class ClientHandler implements Runnable {
                         ServerBoard.getInstance().buyClaimedCard();
                     else
                         ServerBoard.getInstance().buyCard(jsonObject.getInt("card_id"));
+                    ServerBoard.getInstance().getActivePlayer().incrementNumberOfMoves();
                     sendResponse("move_verification", "ok", null, null);
                 } catch (NotEnoughCashException | NothingClaimedException | CardNotOnBoardException | IllegalArgumentException e) {
+                    ok = false;
                     sendResponse("move_verification", "illegal", e.getMessage(), null);
                 }
                 break;
             }
+            case "discard_gems": {
+                try {
+                    ServerBoard.getInstance().getActivePlayer().subCash(new Cash(jsonObject.getInt("white"),
+                            jsonObject.getInt("green"),
+                            jsonObject.getInt("blue"),
+                            jsonObject.getInt("black"),
+                            jsonObject.getInt("red"),0));
+                    if(ServerBoard.getInstance().getActivePlayer().isOverCashLimit())
+                        sendResponse("end_of_round", "discard_gems", null, null);
+                    else
+                        sendResponse("end_of_round", "ok", null, null);
+                } catch (NotEnoughCashException e) {
+                    ok = false;
+                    sendResponse("end_of_round", "discard_gems", null, null);
+                }
+                break;
+            }
+            case "select_noble": {
+                try {
+                    ServerBoard.getInstance().giveNoble(jsonObject.getInt("noble_id"));
+                    sendResponse("end_of_round", "ok", null, null);
+                } catch (NotEnoughDiscountException | CardNotOnBoardException e) {
+                    ok = false;
+                    sendResponse("end_of_round", "select_noble", null, ServerBoard.getInstance().getAvailableNoblesIDs());
+                }
+                break;
+            }
         }
+        return ok;
     }
 
-    private void endOfTurn() throws IOException {
+    private void endOfTurn() throws IOException, ClassNotFoundException {
         String answer = "end_of_round";
-        int cashSum=ServerBoard.getInstance().getActivePlayer().getCash().getYellow() +
-                ServerBoard.getInstance().getActivePlayer().getCash().getBlack() +
-                ServerBoard.getInstance().getActivePlayer().getCash().getBlue() +
-                ServerBoard.getInstance().getActivePlayer().getCash().getGreen() +
-                ServerBoard.getInstance().getActivePlayer().getCash().getRed() +
-                ServerBoard.getInstance().getActivePlayer().getCash().getWhite();
 
-        if(cashSum> Rules.maxPlayerCash) {
+        while (ServerBoard.getInstance().getActivePlayer().isOverCashLimit()) {
             sendResponse(answer, "discard_gems", null, null);
+            verifyEndOfTurn();
         }
 
-        if(ServerBoard.getInstance().getAvailableNoblesIDs().length == 0) {
-            sendResponse(answer, "ok", null, null);
-        }
-        else {
+        while (ServerBoard.getInstance().getAvailableNoblesIDs().length != 0) {
             sendResponse(answer, "select_noble", null, ServerBoard.getInstance().getAvailableNoblesIDs());
+            verifyEndOfTurn();
         }
+        sendResponse(answer, "ok", null, null);
     }
-    private void turn() throws IOException, ClassNotFoundException {
+    private void verifyEndOfTurn() throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
         verifyMove(jsonObject);
+    }
+    private void turn() throws IOException, ClassNotFoundException {
+        JSONObject jsonObject;
+        do {
+            String input = (String) inputStream.readObject();
+            jsonObject = new JSONObject(input);
+        } while(!verifyMove(jsonObject));
     }
     private synchronized void updategame() throws IOException, InterruptedException {
         ObjectMapper mapper=new ObjectMapper();
@@ -293,20 +331,32 @@ public class ClientHandler implements Runnable {
         }
 
     }
-    private synchronized void sendgame() throws InterruptedException, IOException {
 
+    private synchronized void sendgame() throws InterruptedException, IOException {
         String response = server.blockingQueue.take();
         outputStream.writeObject(response);
         outputStream.flush();
-
-
     }
-    private synchronized void increment() throws IOException, ClassNotFoundException, InterruptedException, TooMuchCashException, NobleNotSelectedException {
+
+    private synchronized void increment() throws IOException, InterruptedException, TooMuchCashException, NobleNotSelectedException {
         server.turn = (server.turn + 1)%server.playersNumber;
         System.out.println(server.turn);
         ServerBoard.getInstance().setActivePlayer(server.playersnicks.get(server.turn));
         System.out.println(ServerBoard.getInstance().getActivePlayer());
         updategame();
+    }
+    public void checkGameOver() {
+        winner = ServerBoard.getInstance().checkWin();
+        gameOver = winner != null;
+    }
+    public void gameOver() throws IOException {
+        String response = new JSONObject()
+                .put("answer_type", "game_over")
+                .put("winner", winner)
+                .toString();
+        outputStream.writeObject(response);
+        outputStream.flush();
+        System.out.println(response);
     }
     @Override
     public void run() {
@@ -324,12 +374,14 @@ public class ClientHandler implements Runnable {
 
                 }
                 gameStart();
-                while (true){
+                while (!gameOver){
                        // synchronized (server) {
                             if (server.serverBoard.getActivePlayer().getNick().equals(player.getNick())) {
                                 turn();
-                                increment();
                                 endOfTurn();
+                                //verifyEndOfTurn();
+                                checkGameOver();
+                                increment();
                                 //updategame();
                                // server.notifyAll();
                             //}
@@ -341,6 +393,7 @@ public class ClientHandler implements Runnable {
                         System.out.println("sending data");
                         sendgame();
                 }
+                gameOver();
             }
             catch (InterruptedException | IOException | ClassNotFoundException | InactivePlayersException e) {
                 e.printStackTrace();
