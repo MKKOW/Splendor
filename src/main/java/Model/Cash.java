@@ -99,37 +99,71 @@ public class Cash extends Cost implements Serializable {
      * @param cost      - cost to subtract from
      * @throws NotEnoughCashException   - thrown when there is not enough cash to subtract from even using all yellow gems
      */
-    public int subCost(Cost cost) throws IllegalArgumentException, NotEnoughCashException {
+    public Cash subCost(Cost cost) throws IllegalArgumentException, NotEnoughCashException {
         if (!enough(cost)) {
             throw new NotEnoughCashException(this + " isn't enough to sub from " + cost);
         }
-        int startingYellow = getYellow();
-        white -= cost.white;
-        if (white < 0) {
-            yellow += white;
+        Cash usedCoins = new Cash();
+        if (white - cost.white < 0) {
+            usedCoins.white += white;
+            usedCoins.yellow += Math.abs(getWhite() - cost.getWhite());
+            yellow -= Math.abs(getWhite() - cost.getWhite());
             white = 0;
         }
-        green -= cost.green;
-        if (green < 0) {
-            yellow += green;
+        else {
+            // we have enough cash to cover in gems
+            white -= cost.white;
+            usedCoins.white += cost.white;
+        }
+
+        if (green - cost.green < 0) {
+            usedCoins.green += green;
+            usedCoins.yellow += Math.abs(green - cost.green);
+            yellow -= Math.abs(green - cost.green);
             green = 0;
         }
-        blue -= cost.blue;
-        if (blue < 0) {
-            yellow += blue;
+        else {
+            // we have enough cash to cover in gems
+            green -= cost.green;
+            usedCoins.green += cost.green;
+        }
+
+        if (blue - cost.blue < 0) {
+            usedCoins.blue += blue;
+            usedCoins.yellow += Math.abs(blue - cost.blue);
+            yellow -= Math.abs(blue - cost.blue);
             blue = 0;
         }
-        black -= cost.black;
-        if (black < 0) {
-            yellow += black;
+        else {
+            // we have enough cash to cover in gems
+            blue -= cost.blue;
+            usedCoins.blue += cost.blue;
+        }
+
+        if (black - cost.black < 0) {
+            usedCoins.black += black;
+            usedCoins.yellow += Math.abs(black - cost.black);
+            yellow -= Math.abs(black - cost.black);
             black = 0;
         }
-        red -= cost.red;
-        if (red < 0) {
-            yellow += red;
+        else {
+            // we have enough cash to cover in gems
+            black -= cost.black;
+            usedCoins.black += cost.black;
+        }
+
+        if (red - cost.red < 0) {
+            usedCoins.red += red;
+            usedCoins.yellow += Math.abs(red - cost.red);
+            yellow -= Math.abs(red - cost.red);
             red = 0;
         }
-        return getYellow() - startingYellow;
+        else {
+            // we have enough cash to cover in gems
+            red -= cost.red;
+            usedCoins.red += cost.red;
+        }
+        return usedCoins;
     }
 
     /**

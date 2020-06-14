@@ -147,6 +147,7 @@ public class Cost implements Serializable {
         red += other.red;
         return this;
     }
+
     
     /**
      * Sum white, green, blue, black and red gems

@@ -133,10 +133,9 @@ public class ServerBoard extends ClientBoard implements Serializable{
             throw new IllegalArgumentException("Development card of id " + cardId + " does not exist");
 
         DevelopmentCard developmentCard = developmentCardsOnBoard.getCardById(cardId);
-        int usedYellow = activePlayer.subCost(developmentCard.getCost());
+        Cash usedCoins = activePlayer.subCost(developmentCard.getCost());
         activePlayer.addDevelopmentCard(developmentCard);
-        bankCash.add(developmentCard.getCost().lessBy(activePlayer.getTotalDiscount()));
-        bankCash.addYellow(usedYellow);
+        bankCash.add(usedCoins);
 
         // Clean up
         developmentCardsOnBoard.removeCardById(cardId);
@@ -155,10 +154,9 @@ public class ServerBoard extends ClientBoard implements Serializable{
         DevelopmentCard claimedCard = activePlayer.getClaimedCard();
         if (claimedCard == null) throw new NothingClaimedException("Player " + activePlayer.getNick() + " is not holding any card");
 
-        int usedYellow = activePlayer.subCost(claimedCard.getCost());
-        bankCash.add(activePlayer.getClaimedCard().getCost().lessBy(activePlayer.getTotalDiscount()));
+        Cash usedCoins = activePlayer.subCost(claimedCard.getCost());
+        bankCash.add(usedCoins);
         activePlayer.addClaimedDevelopmentCard();
-        bankCash.addYellow(usedYellow);
         //Clean up
         activePlayer.removeClaim();
     }
@@ -429,5 +427,17 @@ public class ServerBoard extends ClientBoard implements Serializable{
                 ", activePlayer=" + activePlayer + "\n" +
                 ", developmentCardsOnBoard=" + developmentCardsOnBoard + "\n" +
                 '}';
+    }
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException, AmbiguousNickException, TooManyPlayersException, TooMuchCashException, NobleNotSelectedException, NotEnoughCashException, CardNotOnBoardException, TooManyClaimsException, NothingClaimedException {
+        ServerBoard serverBoard = ServerBoard.restoreBoard(Paths.get("src/main/resources/exampleBoard.ser"));
+        serverBoard.addPlayer("Paweł");
+        serverBoard.addPlayer("Wojtek");
+        serverBoard.setActivePlayer("Paweł");
+        serverBoard.activePlayer.setCash(new Cash(0,1,0,0,3,1));
+        serverBoard.claimCard(16);
+        serverBoard.buyClaimedCard();
+        System.out.println(serverBoard);
+        System.out.println(serverBoard.activePlayer.getTotalDiscount());
     }
 }
