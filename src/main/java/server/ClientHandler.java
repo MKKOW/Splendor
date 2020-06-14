@@ -267,7 +267,7 @@ public class ClientHandler implements Runnable {
                         sendResponse("end_of_round", "discard_gems", null, null);
                     else
                         sendResponse("end_of_round", "ok", null, null);
-                } catch (NotEnoughCashException | IllegalCashAmountException e) {
+                } catch (NotEnoughCashException e) {
                     ok = false;
                     sendResponse("end_of_round", "discard_gems", null, null);
                 }

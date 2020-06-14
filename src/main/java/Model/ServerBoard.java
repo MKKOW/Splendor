@@ -1,8 +1,10 @@
 package Model;
 
+import Controller.BoardMaker;
 import Exceptions.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import server.Server;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -131,9 +133,10 @@ public class ServerBoard extends ClientBoard implements Serializable{
             throw new IllegalArgumentException("Development card of id " + cardId + " does not exist");
 
         DevelopmentCard developmentCard = developmentCardsOnBoard.getCardById(cardId);
-        activePlayer.subCost(developmentCard.getCost());
+        int usedYellow = activePlayer.subCost(developmentCard.getCost());
         activePlayer.addDevelopmentCard(developmentCard);
-        bankCash.add(developmentCard.getCost());
+        bankCash.add(developmentCard.getCost().lessBy(activePlayer.getTotalDiscount()));
+        bankCash.addYellow(usedYellow);
 
         // Clean up
         developmentCardsOnBoard.removeCardById(cardId);
@@ -152,9 +155,10 @@ public class ServerBoard extends ClientBoard implements Serializable{
         DevelopmentCard claimedCard = activePlayer.getClaimedCard();
         if (claimedCard == null) throw new NothingClaimedException("Player " + activePlayer.getNick() + " is not holding any card");
 
-        activePlayer.subCost(claimedCard.getCost());
+        int usedYellow = activePlayer.subCost(claimedCard.getCost());
+        bankCash.add(activePlayer.getClaimedCard().getCost().lessBy(activePlayer.getTotalDiscount()));
         activePlayer.addClaimedDevelopmentCard();
-        bankCash.add(claimedCard.getCost());
+        bankCash.addYellow(usedYellow);
         //Clean up
         activePlayer.removeClaim();
     }
@@ -179,7 +183,8 @@ public class ServerBoard extends ClientBoard implements Serializable{
         bankCash.subCash(cash);
         activePlayer.addCash(cash);
     }
-    public void returnCash(int white, int green, int blue, int black, int red) throws NotEnoughCashException, IllegalCashAmountException {
+
+    public void returnCash(int white, int green, int blue, int black, int red) throws NotEnoughCashException {
         Cash cash = new Cash(white, green, blue, black, red, 0);
         bankCash.add(cash);
         activePlayer.subCash(cash);
@@ -424,18 +429,5 @@ public class ServerBoard extends ClientBoard implements Serializable{
                 ", activePlayer=" + activePlayer + "\n" +
                 ", developmentCardsOnBoard=" + developmentCardsOnBoard + "\n" +
                 '}';
-    }
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException, TooMuchCashException, NobleNotSelectedException, NotEnoughCashException, IllegalCashAmountException {
-//        ServerBoard serverBoard = BoardMaker.generateRandomServerBoard(2);
-//        serverBoard.addPlayer("Paweł");
-//        serverBoard.addPlayer("Wojtek");
-//        serverBoard.setActivePlayer("Paweł");
-//        serverBoard.saveBoard(Paths.get("src/main/resources/exampleBoard.ser"));
-
-        ServerBoard serverBoard = ServerBoard.restoreBoard(Paths.get("src/main/resources/exampleBoard.ser"));
-        serverBoard.setActivePlayer("Wojtek");
-
-        System.out.println(Arrays.toString(serverBoard.getAvailableNoblesIDs()));
     }
 }

@@ -36,6 +36,20 @@ public class Cost implements Serializable {
     protected int red;
 
     /**
+     * Lower cost by discount up to 0 gems
+     * @param discount - discount to apply
+     * @return Cost object with discount
+     */
+    public Cost lessBy(Cost discount) {
+        return new Cost(
+                Math.max(white - discount.white, 0),
+                Math.max(green - discount.green, 0),
+                Math.max(blue - discount.black, 0),
+                Math.max(black - discount.black, 0),
+                Math.max(red - discount.red, 0));
+    }
+
+    /**
      * Enumerator corresponding to gem colors
      */
     public enum GemColor {
