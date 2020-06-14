@@ -155,7 +155,7 @@ public class Cash extends Cost implements Serializable {
         if (red - cost.red < 0) {
             result += red - cost.red;
         }
-        return result < yellow;
+        return Math.abs(result) <= yellow;
     }
 
     /**

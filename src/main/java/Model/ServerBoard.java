@@ -179,7 +179,11 @@ public class ServerBoard extends ClientBoard implements Serializable{
         bankCash.subCash(cash);
         activePlayer.addCash(cash);
     }
-
+    public void returnCash(int white, int green, int blue, int black, int red) throws NotEnoughCashException, IllegalCashAmountException {
+        Cash cash = new Cash(white, green, blue, black, red, 0);
+        bankCash.add(cash);
+        activePlayer.subCash(cash);
+    }
     /**
      * Active player gets the noble
      *

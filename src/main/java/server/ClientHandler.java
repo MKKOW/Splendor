@@ -258,16 +258,17 @@ public class ClientHandler implements Runnable {
             }
             case "discard_gems": {
                 try {
-                    ServerBoard.getInstance().getActivePlayer().subCash(new Cash(jsonObject.getInt("white"),
+                    ServerBoard.getInstance().returnCash(
+                            jsonObject.getInt("white"),
                             jsonObject.getInt("green"),
                             jsonObject.getInt("blue"),
                             jsonObject.getInt("black"),
-                            jsonObject.getInt("red"),0));
+                            jsonObject.getInt("red"));
                     if(ServerBoard.getInstance().getActivePlayer().isOverCashLimit())
                         sendResponse("end_of_round", "discard_gems", null, null);
                     else
                         sendResponse("end_of_round", "ok", null, null);
-                } catch (NotEnoughCashException e) {
+                } catch (NotEnoughCashException | IllegalCashAmountException e) {
                     ok = false;
                     sendResponse("end_of_round", "discard_gems", null, null);
                 }

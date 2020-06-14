@@ -34,12 +34,19 @@ public class Game extends JPanel {
     private JSONObject board;
     private JFrame frame;
     private boolean active;
+    private String message;
+    private JPanel communication;
+    private JLabel communicate;
+    private boolean discard;
+    private int selfId;
+    private int[] temporaryStacks;
     public Game(JFrame frame, JSONObject board, String localNick, Client client) throws IOException, ClassNotFoundException {
         super(null);
         this.frame = frame;
         this.board = board;
         nick = localNick;
         this.client = client;
+        message = "";
         setBackground(Color.BLACK);
         frame.add(this);
         loadboard();
@@ -106,6 +113,7 @@ public class Game extends JPanel {
                 players[id].setSize(cardWidth*5,cardHeight);
                 if(claimedCardJSON!=null){
                     claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
+                    setCardBackground(claimedCard,claimedCardJSON);
                     players[id].add(claimedCard);
                 }
                 break;
@@ -114,6 +122,7 @@ public class Game extends JPanel {
                 players[id].setSize(cardWidth,cardHeight*4);
                 if(claimedCardJSON!=null){
                     claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
+                    setCardBackground(claimedCard,claimedCardJSON);
                     players[id].add(claimedCard);
                 }
                 break;
@@ -122,6 +131,7 @@ public class Game extends JPanel {
                 players[id].setSize(cardWidth*5,cardHeight);
                 if(claimedCardJSON!=null){
                     claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
+                    setCardBackground(claimedCard,claimedCardJSON);
                     players[id].add(claimedCard);
                 }
                 break;
@@ -130,19 +140,79 @@ public class Game extends JPanel {
                 players[id].setSize(cardWidth,cardHeight*4);
                 if(claimedCardJSON!=null){
                     claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
+                    setCardBackground(claimedCard,claimedCardJSON);
                     players[id].add(claimedCard);
                 }
                 break;
         }
         if(nick.equals(player.getString("nick"))) {
+            selfId=id;
             if(player.getBoolean("active")) {
                 active = true;
                 addButtons(claimedCard);
             } else
                 active = false;
+            if(discard) {
+                int[] table = new int[5];
+                for(int i=0;i<5;i++){
+                    coinStack stack=players[id].getCosts()[i];
+                    int finalI = i;
+                    stack.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                                table[finalI]++;
+                                stack.setAmount(stack.getAmount()-1);
+                        }
+                    });
+                }
+                JButton discard = new JButton("Discard");
+                discard.setLocation(x+5*cardWidth,y+cardHeight*4);
+                discard.setSize(Width-(x+5*cardWidth),cardHeight);
+                add(discard);
+                discard.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            parseDiscardGem(table);
+                        } catch (IOException | ClassNotFoundException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    }
+                });
+            }
         }
 
     }
+
+    private void parseDiscardGem(int[] table) throws IOException, ClassNotFoundException {
+        JSONObject request=new JSONObject();
+        request.put("request_type","discard_gems");
+        request.put("white",table[0]);
+        request.put("blue",table[1]);
+        request.put("green",table[2]);
+        request.put("red",table[3]);
+        request.put("black",table[4]);
+        System.out.println(request);
+        response=client.takeRequest(request);
+        System.out.println(response);
+        verifyMove();
+    }
+
+    private void setCardBackground(Card claimedCard, JSONObject claimedCardJSON) {
+        String level = claimedCardJSON.getString("level");
+        switch (level) {
+            case "One":
+                claimedCard.setBackground(Color.BLUE);
+                break;
+            case "Two":
+                claimedCard.setBackground(Color.YELLOW);
+                break;
+            case "Three":
+                claimedCard.setBackground(Color.GREEN);
+                break;
+        }
+    }
+
     private void addButtons(Card claimedCard){
             buyCard = new JButton("Buy card");
             claimCard = new JButton("Claim card");
@@ -166,7 +236,6 @@ public class Game extends JPanel {
                             card.addMouseListener(new MouseAdapter() {
                                 @Override
                                 public void mousePressed(MouseEvent e) {
-                                    card.setVisible(false);
                                     for(int i2= 1; i2<=3;i2++) {
                                         for (int j2 = 1; j2 <= 4; j2++) {
                                             Card card2=cards[i2][j2];
@@ -189,7 +258,6 @@ public class Game extends JPanel {
                     claimedCard.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mousePressed(MouseEvent e) {
-                            claimedCard.setVisible(false);
                             for(int i2= 1; i2<=3;i2++) {
                                 for (int j2 = 1; j2 <= 4; j2++) {
                                     Card card2=cards[i2][j2];
@@ -216,7 +284,6 @@ public class Game extends JPanel {
                             card.addMouseListener(new MouseAdapter() {
                                 @Override
                                 public void mousePressed(MouseEvent e) {
-                                    card.setVisible(false);
                                     for(int i2= 1; i2<=3;i2++) {
                                         for (int j2 = 1; j2 <= 4; j2++) {
                                             Card card2=cards[i2][j2];
@@ -249,6 +316,7 @@ public class Game extends JPanel {
                             if(checkTable(table,finalI)){
                                 table[finalI]++;
                                 stack.setAmount(stack.getAmount()-1);
+                                players[selfId].getCosts()[finalI].setAmount(players[selfId].getCosts()[finalI].getAmount()+1);
                                 if(checkFinish(table)) {
                                     for(int i=0;i<5;i++) {
                                         coinStack stack = coinStacks[i];
@@ -395,6 +463,17 @@ public class Game extends JPanel {
             }
         });
         System.out.println(board);
+        communication = new JPanel(null);
+        communicate = new JLabel(message);
+        communicate.setLocation(0,0);
+        communicate.setText(message);
+        communication.setLocation(x+5*cardWidth,0);
+        communication.setSize(Width-x-5*cardWidth,y);
+        communicate.setSize(Width-x-5*cardWidth,y);
+        communication.setBackground(Color.LIGHT_GRAY);
+
+        add(communication);
+        communication.add(communicate);
         revalidate();
         repaint();
         if(!active) {
@@ -413,12 +492,7 @@ public class Game extends JPanel {
         System.out.println(request);
         response=client.takeRequest(request);
         System.out.println(response);
-        if(response.getString("result").equals("ok")) {
-            board = client.getCurrentBoard();
-            System.out.println(board);
-            clear();
-            loadboard();
-        }
+        verifyMove();
     }
     private void parseClaim(int id) throws IOException, ClassNotFoundException {
         JSONObject request=new JSONObject();
@@ -427,12 +501,7 @@ public class Game extends JPanel {
         System.out.println(request);
         response=client.takeRequest(request);
         System.out.println(response);
-        if(response.getString("result").equals("ok")) {
-            board = client.getCurrentBoard();
-            System.out.println(board);
-            clear();
-            loadboard();
-        }
+        verifyMove();
     }
 
     private void parseBuy(int id,String place) throws IOException, ClassNotFoundException {
@@ -443,11 +512,48 @@ public class Game extends JPanel {
         System.out.println(request);
         response=client.takeRequest(request);
         System.out.println(response);
-        if(response.getString("result").equals("ok")) {
+        verifyMove();
+    }
+    private void verifyMove() throws IOException, ClassNotFoundException {
+        if(response.getString("answer_type").equals("move_verification")) {
+            if (response.getString("result").equals("ok")) {
+                response = client.getResponse();
+                System.out.println(response);
+                if(response.getString("answer_type").equals("end_of_round")) {
+                    endOfRound();
+                }
+            }
+            else{
+                message = "Illegal move";
+                clear();
+                loadboard();
+            }
+        }else if(response.getString("answer_type").equals("end_of_round")){
+                endOfRound();
+        }
+        else{
+            System.out.println("Something went wrong:"+response);
+        }
+    }
+    private void endOfRound() throws IOException, ClassNotFoundException {
+        if (response.getString("result").equals("ok")) {
             board = client.getCurrentBoard();
-            System.out.println(board);
+            message = "Ok";
+            discard = false;
             clear();
             loadboard();
+        } else if(response.getString("result").equals("discard_gems")) {
+            message = "You have to discard some of your gems";
+            discard=true;
+            temporaryStacks = new int[5];
+            for (int i=0;i<5;i++){
+                temporaryStacks[i] = players[selfId].getCosts()[i].getAmount();
+            }
+            clear();
+            loadboard();
+            for (int i=0;i<5;i++) {
+                players[selfId].getCosts()[i].setAmount(temporaryStacks[i]);
+            }
         }
     }
 }

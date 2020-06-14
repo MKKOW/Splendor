@@ -576,9 +576,11 @@ public class Client implements Runnable{
         answers.add(jsonInput);
         return jsonInput;
     }
-    public JSONObject getResponse () {
-        currentResponse = answers.remove();
-        return currentResponse;
+    public JSONObject getResponse () throws IOException, ClassNotFoundException {
+        String input = (String) inputStream.readObject();
+        JSONObject jsonInput = new JSONObject(input);
+        answers.add(jsonInput);
+        return jsonInput;
     }
     public JSONObject getCurrentBoard () throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
@@ -627,7 +629,7 @@ public class Client implements Runnable{
                  */
         InetAddress ip = null;
         try {
-            ip = InetAddress.getByName("localhost");
+            ip = InetAddress.getByName(host);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

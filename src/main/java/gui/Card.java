@@ -189,4 +189,7 @@ public class Card extends JPanel{
     public int getId() {
         return id;
     }
+    public coinStack[] getCosts(){
+        return costs;
+    }
 }
