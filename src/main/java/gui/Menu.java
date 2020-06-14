@@ -3,14 +3,11 @@ package gui;
 import Controller.BoardMaker;
 import Exceptions.InactivePlayersException;
 import Model.ClientBoard;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 /**
  * GUI for the menu section

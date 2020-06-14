@@ -14,7 +14,6 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static java.lang.Thread.sleep;
 
 public class ClientHandler implements Runnable {
     /**

@@ -4,9 +4,6 @@ import org.json.JSONObject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 
 public class Card extends JPanel{
     private coinStack[] costs;//white, blue, green, red ,black

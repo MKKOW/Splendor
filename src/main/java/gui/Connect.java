@@ -1,9 +1,5 @@
 package gui;
 
-import Controller.BoardMaker;
-import Model.ClientBoard;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import server.Client;
 

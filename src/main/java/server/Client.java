@@ -4,25 +4,17 @@ import Exceptions.InactivePlayersException;
 import Exceptions.NobleNotSelectedException;
 import Exceptions.TooMuchCashException;
 import Model.*;
-import client.Card;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.management.PlatformLoggingMXBean;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.URI;
 import java.net.UnknownHostException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
-import static java.lang.Thread.sleep;
 
 public class Client implements Runnable{
     /**
@@ -587,6 +579,9 @@ public class Client implements Runnable{
         System.out.println(input);
         while(!input.contains("game_board")&&!input.contains("game_start")){
             input = (String) inputStream.readObject();
+            if(input.contains("game_over")){
+                return new JSONObject(input);
+            }
         }
         JSONObject jsonObject = new JSONObject(input);
         System.out.println(jsonObject);

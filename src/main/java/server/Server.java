@@ -113,7 +113,7 @@ public class Server {
         }
     public static void main(String[] args)  {
         try{
-            Server server = new Server(defaultport,2);
+            Server server = new Server(defaultport,Integer.parseInt(args[1]));
             server.runserver();
         }
         catch (Exception e){

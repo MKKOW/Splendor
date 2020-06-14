@@ -1,9 +1,5 @@
 package gui;
 
-import Controller.BoardMaker;
-import Exceptions.InactivePlayersException;
-import Model.ClientBoard;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import server.Client;
@@ -109,7 +105,7 @@ public class Game extends JPanel {
         Card claimedCard = null;
         switch (id) {
             case 0:
-                players[id].setLocation(x, y+cardHeight*4);
+                players[id].setLocation(x, Height-cardHeight);
                 players[id].setSize(cardWidth*5,cardHeight);
                 if(claimedCardJSON!=null){
                     claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
@@ -118,7 +114,7 @@ public class Game extends JPanel {
                 }
                 break;
             case 1:
-                players[id].setLocation(Width-2*cardWidth, y);
+                players[id].setLocation(Width-cardWidth, y);
                 players[id].setSize(cardWidth,cardHeight*4);
                 if(claimedCardJSON!=null){
                     claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
@@ -166,7 +162,7 @@ public class Game extends JPanel {
                     });
                 }
                 JButton discard = new JButton("Discard");
-                discard.setLocation(x+5*cardWidth,y+cardHeight*4);
+                discard.setLocation(x+5*cardWidth,Height-cardHeight);
                 discard.setSize(Width-(x+5*cardWidth),cardHeight);
                 add(discard);
                 discard.addActionListener(new ActionListener() {
@@ -217,9 +213,9 @@ public class Game extends JPanel {
             buyCard = new JButton("Buy card");
             claimCard = new JButton("Claim card");
             getGems = new JButton("Get gems");
-            buyCard.setLocation(0,y+cardHeight*4);
-            claimCard.setLocation(x/3,y+cardHeight*4);
-            getGems.setLocation(x*2/3,y+cardHeight*4);
+            buyCard.setLocation(0,Height-cardHeight);
+            claimCard.setLocation(x/3,Height-cardHeight);
+            getGems.setLocation(x*2/3,Height-cardHeight);
             buyCard.setSize(x/3,cardHeight);
             claimCard.setSize(x/3,cardHeight);
             getGems.setSize(x/3,cardHeight);
@@ -277,8 +273,8 @@ public class Game extends JPanel {
         claimCard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for(int i= 0; i<=3;i++){
-                    for(int j= 0;j<=4;j++){
+                for(int i= 1; i<4;i++){
+                    for(int j= 1;j<5;j++){
                         Card card=cards[i][j];
                         if(card!=null){
                             card.addMouseListener(new MouseAdapter() {
@@ -531,13 +527,16 @@ public class Game extends JPanel {
         }else if(response.getString("answer_type").equals("end_of_round")){
                 endOfRound();
         }
-        else{
-            System.out.println("Something went wrong:"+response);
+        else if(response.getString("answer_type").equals("game_over")){
+            endGame(response);
         }
     }
     private void endOfRound() throws IOException, ClassNotFoundException {
         if (response.getString("result").equals("ok")) {
             board = client.getCurrentBoard();
+            if(board.toString().contains("game_over")){
+                endGame(board);
+            }
             message = "Ok";
             discard = false;
             clear();
@@ -554,6 +553,46 @@ public class Game extends JPanel {
             for (int i=0;i<5;i++) {
                 players[selfId].getCosts()[i].setAmount(temporaryStacks[i]);
             }
+        } else if(response.getString("result").equals("select_noble")){
+            message = "Pick noble";
+            communicate.setText(message);
+            int len=response.getJSONArray("nobles").length();
+            int[] noble_ids = new int[len];
+            for(int i=0;i<len;i++){
+                noble_ids[i]=response.getJSONArray("nobles").getInt(i);
+            }
+            for(int i=0;i<cards[0].length;i++){
+                Card card = cards[0][i];
+                for(int j=0;j<len;j++){
+                    if(card.getId()==noble_ids[j]){
+                        card.setBackground(Color.LIGHT_GRAY);
+                        card.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mousePressed(MouseEvent e) {
+                                try {
+                                    parseSelectNoble(card.getId());
+                                } catch (IOException | ClassNotFoundException ioException) {
+                                    ioException.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
         }
+    }
+
+    private void endGame(JSONObject response) {
+        communicate.setText("End of game. Winner: "+response.getString("winner"));
+    }
+
+    private void parseSelectNoble(int id) throws IOException, ClassNotFoundException {
+        JSONObject request=new JSONObject();
+        request.put("request_type","select_noble");
+        request.put("noble_id",id);
+        System.out.println(request);
+        response=client.takeRequest(request);
+        System.out.println(response);
+        verifyMove();
     }
 }
