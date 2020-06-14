@@ -99,10 +99,11 @@ public class Cash extends Cost implements Serializable {
      * @param cost      - cost to subtract from
      * @throws NotEnoughCashException   - thrown when there is not enough cash to subtract from even using all yellow gems
      */
-    public Cash subCost(Cost cost) throws IllegalArgumentException, NotEnoughCashException {
+    public int subCost(Cost cost) throws IllegalArgumentException, NotEnoughCashException {
         if (!enough(cost)) {
             throw new NotEnoughCashException(this + " isn't enough to sub from " + cost);
         }
+        int startingYellow = getYellow();
         white -= cost.white;
         if (white < 0) {
             yellow += white;
@@ -128,7 +129,7 @@ public class Cash extends Cost implements Serializable {
             yellow += red;
             red = 0;
         }
-        return this;
+        return getYellow() - startingYellow;
     }
 
     /**
@@ -146,10 +147,10 @@ public class Cash extends Cost implements Serializable {
         if (green - cost.green < 0) {
             result += green - cost.green;
         }
-        if (blue - cost.blue < 0) {
+        if (blue  - cost.blue < 0) {
             result += blue - cost.blue;
         }
-        if (black - cost.black < 0) {
+        if (black  - cost.black < 0) {
             result += black - cost.black;
         }
         if (red - cost.red < 0) {

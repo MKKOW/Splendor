@@ -76,6 +76,11 @@ public class BankCash extends Cost implements Serializable {
         this.yellow -= cash.yellow;
     }
 
+    void addYellow(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("Yellow amount cannot be negative");
+        this.yellow += amount;
+    }
+
     /**
      * Check if bank has enough cash to subtract from
      * @param cash - cash to subtract
