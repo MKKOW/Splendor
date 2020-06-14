@@ -105,7 +105,7 @@ public class Player implements Serializable {
      * @param costToSub - cost to subtract (development card cost)
      * @throws NotEnoughCashException - if player doesn't have enough cash to subtract from even using all his yellow gems
      */
-    public int subCost(Cost costToSub) throws NotEnoughCashException {
+    public Cash subCost(Cost costToSub) throws NotEnoughCashException {
         try {
             return cash.subCost(costToSub.lessBy(getTotalDiscount()));
         } catch (NotEnoughCashException e) {

@@ -33,11 +33,11 @@ public class Rules implements Serializable {
     /**
      * Path to resource with cards information
      */
-    public static final Path cardsFilePath = Paths.get("cards.json");
+    public static final Path cardsFilePath = Paths.get("src/main/resources/cards.json");
     /**
      * Path to resource with noble information
      */
-    public static final Path nobleFilePath = Paths.get("nobles.json");
+    public static final Path nobleFilePath = Paths.get("src/main/resources/nobles.json");
     /**
      * Total number of cards in the card file
      */

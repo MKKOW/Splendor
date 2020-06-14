@@ -65,7 +65,6 @@ public class CardsOnBoard implements Serializable {
      */
     @NotNull
     public DevelopmentCard getCardById(int cardId) throws CardNotOnBoardException {
-        DevelopmentCard developmentCard = null;
         if (cardId <= Rules.maxDevelopmentCardLevel1Id) {
             for (DevelopmentCard card : level1) {
                 if (card != null && card.getId() == cardId) {
