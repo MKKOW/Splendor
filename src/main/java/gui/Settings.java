@@ -13,7 +13,7 @@ import java.io.IOException;
  * GUI for the settings section
  */
 public class Settings {
-    public static final String configPath = "src/main/resources/.config";
+    public static final String configPath = ".config";
     private JButton applyButton;
     protected JPanel view;
     private JButton returnButton;

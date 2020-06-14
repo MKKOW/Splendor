@@ -154,7 +154,7 @@ public class ServerBoard extends ClientBoard implements Serializable{
 
         activePlayer.subCost(claimedCard.getCost());
         activePlayer.addClaimedDevelopmentCard();
-
+        bankCash.add(claimedCard.getCost());
         //Clean up
         activePlayer.removeClaim();
     }

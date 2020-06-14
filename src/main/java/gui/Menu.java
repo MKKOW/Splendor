@@ -27,7 +27,7 @@ public class Menu{
         Width=frame.getWidth();
         Height=frame.getHeight();
         view=new JPanel(null);
-        ImageIcon icon=new ImageIcon("src/main/resources/logo.gif");
+        ImageIcon icon=new ImageIcon("logo.gif");
         int imageHeight=icon.getIconHeight();
         int imageWidth=icon.getIconWidth();
         title=new JLabel(icon);
