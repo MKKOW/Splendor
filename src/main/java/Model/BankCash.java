@@ -72,6 +72,7 @@ public class BankCash extends Cost implements Serializable {
         this.green -= cash.green;
         this.blue -= cash.blue;
         this.black -= cash.black;
+        this.red -= cash.red;
         this.yellow -= cash.yellow;
     }
 

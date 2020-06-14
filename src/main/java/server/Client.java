@@ -568,6 +568,7 @@ public class Client implements Runnable{
                 System.out.println("nowa tura");
     }
     public JSONObject takeRequest (JSONObject jsonObject) throws IOException, ClassNotFoundException {
+        jsonObject.put("client_id",clientID.toString());
         outputStream.writeObject(jsonObject.toString());
         outputStream.flush();
         String input = (String) inputStream.readObject();
@@ -581,7 +582,12 @@ public class Client implements Runnable{
     }
     public JSONObject getCurrentBoard () throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
+        System.out.println(input);
+        while(!input.contains("game_board")&&!input.contains("game_start")){
+            input = (String) inputStream.readObject();
+        }
         JSONObject jsonObject = new JSONObject(input);
+        System.out.println(jsonObject);
         String boardString = jsonObject.getString("Board");
         currentBoard = new JSONObject(boardString);
         return currentBoard;

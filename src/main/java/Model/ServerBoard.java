@@ -211,6 +211,9 @@ public class ServerBoard extends ClientBoard implements Serializable{
         DevelopmentCard cardToClaim = developmentCardsOnBoard.getCardById(cardId);
         activePlayer.claimDevelopmentCard(cardToClaim);
         bankCash.giveYellow(activePlayer);
+        // Clean up
+        developmentCardsOnBoard.removeCardById(cardId);
+        refillDevelopmentCards();
     }
 
     /**

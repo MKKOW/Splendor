@@ -38,6 +38,7 @@ public class Connect extends JPanel {
     private int fontHeight;
     private int labelsWidth;
     private int buttonWidth;
+    private JSONObject response;
     public Connect(JFrame jframe){
         super(null);
         frame=jframe;
@@ -106,22 +107,13 @@ public class Connect extends JPanel {
                 try {
                     host = hostArea.getText();
                     port = Integer.parseInt(portArea.getText());
-                    //Client client=new Client(port,host);
-                    //client.runClient();
+                    client=new Client(port,host);
+                    new Thread(client).start();
                     clear();
                     setNick();
-                    //<temporary>
-                    //ClientBoard board=BoardMaker.generatePresentationBoard();
-                    //ObjectMapper mapper = new ObjectMapper();
-                    //String json = mapper.writeValueAsString(board);
-                    //JSONObject object=new JSONObject(json);
-                    //<\temporary>
-                    //frame.setContentPane(new Game(frame,object));
-                    //frame.setContentPane(new Game(frame,object,));
                 }
                 catch (Exception exception){
-                    setVisible(true);
-                    setTitleLabel("Could not connect to that server!");
+                    exception.printStackTrace();
                 }
             }
         });
@@ -136,42 +128,40 @@ public class Connect extends JPanel {
         field.add(nickArea);
         play=new JButton("Play");
         play.setSize(buttonWidth,fontHeight);
-        play.setLocation((field.getWidth()-play.getWidth()),fontHeight*5);
+        play.setLocation((field.getWidth()-play.getWidth())/2,fontHeight*5);
         field.add(play);
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-              //  try {
-                    setVisible(false);
-                    String nick = nickArea.getText();
-                    //<temporary>
+                String nick = nickArea.getText();
+                JSONObject request = new JSONObject();
+                request.put("request_type","client_hello");
+                request.put("set_nick",nick);
+                request.put("client_version","dontcare");
                 try {
-                    ClientBoard.setInstanceFromServerBoard(BoardMaker.generateRandomServerBoard(4));
-                } catch (IOException ioException) {
+                    response = client.takeRequest(request);
+                } catch (IOException | ClassNotFoundException ioException) {
                     ioException.printStackTrace();
                 }
-                ClientBoard board= ClientBoard.getInstance();
-                System.out.println(board);
-                ObjectMapper mapper = new ObjectMapper();
-                String json = null;
-                try {
-                    json = mapper.writeValueAsString(board);
-                } catch (JsonProcessingException jsonProcessingException) {
-                    jsonProcessingException.printStackTrace();
+                System.out.println(response);
+                if(response.getString("result").equals("invalid")){
+                    setTitleLabel("Nick already taken");
                 }
-                JSONObject object=new JSONObject(json);
-                    //<\temporary>
-                try {
-                    frame.setContentPane(new Game(frame,object,nick));
-                } catch (JsonProcessingException jsonProcessingException) {
-                    jsonProcessingException.printStackTrace();
+                else{
+                    play.setVisible(false);
+                    setTitleLabel("Wait for other players");
+                    revalidate();
+                    repaint();
+                    try {
+                        JSONObject board = client.getCurrentBoard();
+                        frame.setContentPane(new Game(frame,board,nick,client));
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    } catch (ClassNotFoundException classNotFoundException) {
+                        classNotFoundException.printStackTrace();
+                    }
                 }
-                //frame.setContentPane(new Game(frame,object,client));
-               // }
-              //  catch (Exception exception){
-              //      setVisible(true);
-               //     setTitleLabel("Could not connect to that server!");
-               // }
+
             }
         });
     }

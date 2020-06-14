@@ -6,10 +6,12 @@ import Model.ClientBoard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import server.Client;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class Game extends JPanel {
     private Card[][] cards;
@@ -27,14 +29,282 @@ public class Game extends JPanel {
     private JButton claimCard;
     private JButton buyCard;
     private JButton getGems;
-    public Game(JFrame frame, JSONObject board, String localNick) throws JsonProcessingException {
+    private Client client;
+    private JSONObject response;
+    private JSONObject board;
+    private JFrame frame;
+    private boolean active;
+    public Game(JFrame frame, JSONObject board, String localNick, Client client) throws IOException, ClassNotFoundException {
         super(null);
+        this.frame = frame;
+        this.board = board;
         nick = localNick;
+        this.client = client;
         setBackground(Color.BLACK);
+        frame.add(this);
+        loadboard();
+
+    }
+    class boardListener implements Runnable{
+        public boolean done;
+        public boardListener(){
+            super();
+            done = false;
+        }
+        @Override
+        public void run() {
+            try {
+                board = client.getCurrentBoard();
+                clear();
+                loadboard();
+                done=true;
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    void makePlayer(int id,JSONObject player) throws IOException, ClassNotFoundException {
+        int[] cost=new int[6];
+        int[] discount= new int[6];
+        JSONObject developmentCards=player.getJSONObject("developmentCards");
+        String[] ids=JSONObject.getNames(developmentCards);
+        JSONObject cash=player.getJSONObject("cash");
+        cost[0]+=cash.getInt("white");
+        cost[1]+=cash.getInt("blue");
+        cost[2]+=cash.getInt("green");
+        cost[3]+=cash.getInt("red");
+        cost[4]+=cash.getInt("black");
+        cost[5]+=cash.getInt("yellow");
+        if(ids!=null) {
+            for (String i : ids) {
+                JSONObject card = developmentCards.getJSONObject(i);
+                JSONObject discounts = card.getJSONObject("discount");
+                discount[0] += discounts.getInt("white");
+                discount[1] += discounts.getInt("blue");
+                discount[2] += discounts.getInt("green");
+                discount[3] += discounts.getInt("red");
+                discount[4] += discounts.getInt("black");
+                discount[5] = 0;
+            }
+        }
+        int points=0;
+        players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],discount[5],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
+        add(players[id]);
+        players[id].forceVisible();
+        JSONObject claimedCardJSON = null;
+        try {//Nothing else worked
+            claimedCardJSON = player.getJSONObject("claimedCard");
+        }
+        catch (Exception ignored){
+
+        }
+        Card claimedCard = null;
+        switch (id) {
+            case 0:
+                players[id].setLocation(x, y+cardHeight*4);
+                players[id].setSize(cardWidth*5,cardHeight);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
+                break;
+            case 1:
+                players[id].setLocation(Width-2*cardWidth, y);
+                players[id].setSize(cardWidth,cardHeight*4);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
+                break;
+            case 2:
+                players[id].setLocation(x, 0);
+                players[id].setSize(cardWidth*5,cardHeight);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
+                break;
+            case 3:
+                players[id].setLocation(0, y);
+                players[id].setSize(cardWidth,cardHeight*4);
+                if(claimedCardJSON!=null){
+                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
+                    players[id].add(claimedCard);
+                }
+                break;
+        }
+        if(nick.equals(player.getString("nick"))) {
+            if(player.getBoolean("active")) {
+                active = true;
+                addButtons(claimedCard);
+            } else
+                active = false;
+        }
+
+    }
+    private void addButtons(Card claimedCard){
+            buyCard = new JButton("Buy card");
+            claimCard = new JButton("Claim card");
+            getGems = new JButton("Get gems");
+            buyCard.setLocation(0,y+cardHeight*4);
+            claimCard.setLocation(x/3,y+cardHeight*4);
+            getGems.setLocation(x*2/3,y+cardHeight*4);
+            buyCard.setSize(x/3,cardHeight);
+            claimCard.setSize(x/3,cardHeight);
+            getGems.setSize(x/3,cardHeight);
+            add(buyCard);
+            add(claimCard);
+            add(getGems);
+            buyCard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i= 1; i<=3;i++){
+                    for(int j=1;j<=4;j++){
+                        Card card=cards[i][j];
+                        if(card!=null){
+                            card.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mousePressed(MouseEvent e) {
+                                    card.setVisible(false);
+                                    for(int i2= 1; i2<=3;i2++) {
+                                        for (int j2 = 1; j2 <= 4; j2++) {
+                                            Card card2=cards[i2][j2];
+                                            card2.removeMouseListener(card2.getMouseListeners()[0]);
+                                        }
+                                    }
+                                    if(claimedCard!= null)
+                                        claimedCard.removeMouseListener(claimedCard.getMouseListeners()[0]);
+                                        try {
+                                            parseBuy(card.getId(), "table");
+                                        } catch (IOException | ClassNotFoundException ioException) {
+                                            ioException.printStackTrace();
+                                        }
+                                }
+                            });
+                        }
+                    }
+                }
+                if(claimedCard!=null){
+                    claimedCard.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            claimedCard.setVisible(false);
+                            for(int i2= 1; i2<=3;i2++) {
+                                for (int j2 = 1; j2 <= 4; j2++) {
+                                    Card card2=cards[i2][j2];
+                                    card2.removeMouseListener(card2.getMouseListeners()[0]);
+                                }
+                            }
+                            try {
+                                parseBuy(claimedCard.getId(),"hand");
+                            } catch (IOException | ClassNotFoundException ioException) {
+                                ioException.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        claimCard.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i= 0; i<=3;i++){
+                    for(int j= 0;j<=4;j++){
+                        Card card=cards[i][j];
+                        if(card!=null){
+                            card.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mousePressed(MouseEvent e) {
+                                    card.setVisible(false);
+                                    for(int i2= 1; i2<=3;i2++) {
+                                        for (int j2 = 1; j2 <= 4; j2++) {
+                                            Card card2=cards[i2][j2];
+                                            if(card2!=null)
+                                                card2.removeMouseListener(card2.getMouseListeners()[0]);
+                                        }
+                                    }
+                                    try {
+                                        parseClaim(card.getId());
+                                    } catch (IOException | ClassNotFoundException ioException) {
+                                        ioException.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+        getGems.addActionListener(new ActionListener() {
+            int[] table = new int[5];
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(int i=0;i<5;i++){
+                    coinStack stack=coinStacks[i];
+                    int finalI = i;
+                    stack.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            if(checkTable(table,finalI)){
+                                table[finalI]++;
+                                stack.setAmount(stack.getAmount()-1);
+                                if(checkFinish(table)) {
+                                    for(int i=0;i<5;i++) {
+                                        coinStack stack = coinStacks[i];
+                                        stack.removeMouseListener(stack.getMouseListeners()[0]);
+                                    }
+                                    try {
+                                        parseGetGem(table);
+                                    } catch (IOException | ClassNotFoundException ioException) {
+                                        ioException.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+    private boolean checkFinish(int[] table) {
+        int count_single=0;
+        for(int i=0;i<table.length;i++){
+            if(table[i]==2)
+                return true;
+            if(table[i]==1)
+                count_single++;
+        }
+        if(count_single==3){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkTable(int[] table, int finalI) {
+        if(table[finalI]==1) {
+            for (int i = 0; i < table.length; i++) {
+                if(i!=finalI&&table[i]==1){
+                    return false;
+                }
+            }
+            return true;
+        }else{
+            return true;
+        }
+    }
+
+    private void clear() {
+        removeAll();
+    }
+
+    private void loadboard() throws IOException, ClassNotFoundException {
         cards=new Card[4][5];
         players=new Card[4];
         Menu=new JButton("Menu");
-        cardHeight=frame.getHeight()/6;
+        cardHeight=frame.getHeight()/7;
         cardWidth=cardHeight*57/88;
         Width=frame.getWidth();
         System.out.println(Width);
@@ -116,247 +386,68 @@ public class Game extends JPanel {
                 add(card);
             }
         }
-        frame.add(this);
+        JFrame finalFrame = frame;
         Menu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
-                frame.setContentPane(new Menu(frame).view);
+                finalFrame.setContentPane(new Menu(finalFrame).view);
             }
         });
         System.out.println(board);
-    }
-    void makePlayer(int id,JSONObject player){
-        int[] cost=new int[6];
-        int[] discount= new int[6];
-        JSONObject developmentCards=player.getJSONObject("developmentCards");
-        String[] ids=JSONObject.getNames(developmentCards);
-        JSONObject cash=player.getJSONObject("cash");
-        cost[0]+=cash.getInt("white");
-        cost[1]+=cash.getInt("blue");
-        cost[2]+=cash.getInt("green");
-        cost[3]+=cash.getInt("red");
-        cost[4]+=cash.getInt("black");
-        cost[5]+=cash.getInt("yellow");
-        if(ids!=null) {
-            for (String i : ids) {
-                JSONObject card = developmentCards.getJSONObject(i);
-                JSONObject discounts = card.getJSONObject("discount");
-                discount[0] += discounts.getInt("white");
-                discount[1] += discounts.getInt("blue");
-                discount[2] += discounts.getInt("green");
-                discount[3] += discounts.getInt("red");
-                discount[4] += discounts.getInt("black");
-                discount[5] = 0;
-            }
-        }
-        int points=0;
-        players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],discount[5],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
-        add(players[id]);
-        players[id].forceVisible();
-        JSONObject claimedCardJSON = null;
-        try {//Nothing else worked
-            claimedCardJSON = player.getJSONObject("claimedCard");
-        }
-        catch (Exception ignored){
-
-        }
-        Card claimedCard = null;
-        switch (id) {
-            case 0:
-                players[id].setLocation(x, y+cardHeight*4);
-                players[id].setSize(cardWidth*5,cardHeight);
-                if(claimedCardJSON!=null){
-                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
-                    players[id].add(claimedCard);
-                }
-                break;
-            case 1:
-                players[id].setLocation(Width-cardWidth, y);
-                players[id].setSize(cardWidth,cardHeight*4);
-                if(claimedCardJSON!=null){
-                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
-                    players[id].add(claimedCard);
-                }
-                break;
-            case 2:
-                players[id].setLocation(x, 0);
-                players[id].setSize(cardWidth*5,cardHeight);
-                if(claimedCardJSON!=null){
-                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,cardWidth,0,"Claimed Card");
-                    players[id].add(claimedCard);
-                }
-                break;
-            case 3:
-                players[id].setLocation(0, y);
-                players[id].setSize(cardWidth,cardHeight*4);
-                if(claimedCardJSON!=null){
-                    claimedCard=new Card(claimedCardJSON,true,cardWidth,cardHeight,0,cardHeight,"Claimed Card");
-                    players[id].add(claimedCard);
-                }
-                break;
-        }
-        if(nick.equals(player.getString("nick")))
-            addButtons(claimedCard);
-    }
-    private void addButtons(Card claimedCard){
-            buyCard = new JButton("Buy card");
-            claimCard = new JButton("Claim card");
-            getGems = new JButton("Get gems");
-            buyCard.setLocation(0,y+cardHeight*4);
-            claimCard.setLocation(x/3,y+cardHeight*4);
-            getGems.setLocation(x*2/3,y+cardHeight*4);
-            buyCard.setSize(x/3,cardHeight);
-            claimCard.setSize(x/3,cardHeight);
-            getGems.setSize(x/3,cardHeight);
-            add(buyCard);
-            add(claimCard);
-            add(getGems);
-            buyCard.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for(int i= 1; i<=3;i++){
-                    for(int j=1;j<=4;j++){
-                        Card card=cards[i][j];
-                        if(card!=null){
-                            card.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mousePressed(MouseEvent e) {
-                                    card.setVisible(false);
-                                    for(int i2= 1; i2<=3;i2++) {
-                                        for (int j2 = 1; j2 <= 4; j2++) {
-                                            Card card2=cards[i2][j2];
-                                            card2.removeMouseListener(card2.getMouseListeners()[0]);
-                                        }
-                                    }
-                                    if(claimedCard!= null)
-                                        claimedCard.removeMouseListener(claimedCard.getMouseListeners()[0]);
-                                    parseBuy(claimedCard.getId(),"table");
-                                }
-                            });
-                        }
-                    }
-                }
-                if(claimedCard!=null){
-                    claimedCard.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            claimedCard.setVisible(false);
-                            for(int i2= 1; i2<=3;i2++) {
-                                for (int j2 = 1; j2 <= 4; j2++) {
-                                    Card card2=cards[i2][j2];
-                                    card2.removeMouseListener(card2.getMouseListeners()[0]);
-                                }
-                            }
-                            parseBuy(claimedCard.getId(),"hand");
-                        }
-                    });
-                }
-            }
-        });
-        claimCard.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for(int i= 0; i<=3;i++){
-                    for(int j= 0;j<=4;j++){
-                        Card card=cards[i][j];
-                        if(card!=null){
-                            card.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mousePressed(MouseEvent e) {
-                                    card.setVisible(false);
-                                    for(int i2= 1; i2<=3;i2++) {
-                                        for (int j2 = 1; j2 <= 4; j2++) {
-                                            Card card2=cards[i2][j2];
-                                            if(card2!=null)
-                                                card2.removeMouseListener(card2.getMouseListeners()[0]);
-                                        }
-                                    }
-                                    parseClaim(card.getId());
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        });
-        getGems.addActionListener(new ActionListener() {
-            int[] table = new int[5];
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for(int i=0;i<5;i++){
-                    coinStack stack=coinStacks[i];
-                    int finalI = i;
-                    stack.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mousePressed(MouseEvent e) {
-                            if(checkTable(table,finalI)){
-                                table[finalI]++;
-                                stack.setAmount(stack.getAmount()-1);
-                                if(checkFinish(table)) {
-                                    for(int i=0;i<5;i++) {
-                                        coinStack stack = coinStacks[i];
-                                        stack.removeMouseListener(stack.getMouseListeners()[0]);
-                                    }
-                                    parseGetGem(table);
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-
-    private boolean checkFinish(int[] table) {
-        int count_single=0;
-        for(int i=0;i<table.length;i++){
-            if(table[i]==2)
-                return true;
-            if(table[i]==1)
-                count_single++;
-        }
-        if(count_single==3){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean checkTable(int[] table, int finalI) {
-        if(table[finalI]==1) {
-            for (int i = 0; i < table.length; i++) {
-                if(i!=finalI&&table[i]==1){
-                    return false;
-                }
-            }
-            return true;
-        }else{
-            return true;
+        revalidate();
+        repaint();
+        if(!active) {
+            boardListener boardListener = new boardListener();
+            new Thread(boardListener).start();
         }
     }
-    private void parseGetGem(int[] table) {
+    private void parseGetGem(int[] table) throws IOException, ClassNotFoundException {
         JSONObject request=new JSONObject();
-        request.put("request_type","claim_card");
+        request.put("request_type","get_gems");
         request.put("white",table[0]);
         request.put("blue",table[1]);
         request.put("green",table[2]);
         request.put("red",table[3]);
         request.put("black",table[4]);
         System.out.println(request);
+        response=client.takeRequest(request);
+        System.out.println(response);
+        if(response.getString("result").equals("ok")) {
+            board = client.getCurrentBoard();
+            System.out.println(board);
+            clear();
+            loadboard();
+        }
     }
-    private void parseClaim(int id) {
+    private void parseClaim(int id) throws IOException, ClassNotFoundException {
         JSONObject request=new JSONObject();
         request.put("request_type","claim_card");
         request.put("card_id",id);
         System.out.println(request);
+        response=client.takeRequest(request);
+        System.out.println(response);
+        if(response.getString("result").equals("ok")) {
+            board = client.getCurrentBoard();
+            System.out.println(board);
+            clear();
+            loadboard();
+        }
     }
 
-    private void parseBuy(int id,String place) {
+    private void parseBuy(int id,String place) throws IOException, ClassNotFoundException {
         JSONObject request=new JSONObject();
         request.put("request_type","buy_card");
         request.put("place",place);
         request.put("card_id",id);
         System.out.println(request);
+        response=client.takeRequest(request);
+        System.out.println(response);
+        if(response.getString("result").equals("ok")) {
+            board = client.getCurrentBoard();
+            System.out.println(board);
+            clear();
+            loadboard();
+        }
     }
 }
