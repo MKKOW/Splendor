@@ -175,19 +175,19 @@ public class Cash extends Cost implements Serializable {
      */
     public boolean enough(@NotNull Cost cost) {
         int result = 0;
-        if (white - cost.white < 0) {
+        if (white - cost.white <= 0) {
             result += white - cost.white;
         }
-        if (green - cost.green < 0) {
+        if (green - cost.green <=0) {
             result += green - cost.green;
         }
-        if (blue  - cost.blue < 0) {
+        if (blue  - cost.blue <= 0) {
             result += blue - cost.blue;
         }
-        if (black  - cost.black < 0) {
+        if (black  - cost.black <= 0) {
             result += black - cost.black;
         }
-        if (red - cost.red < 0) {
+        if (red - cost.red <= 0) {
             result += red - cost.red;
         }
         return Math.abs(result) <= yellow;

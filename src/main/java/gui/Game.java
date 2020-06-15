@@ -69,9 +69,7 @@ public class Game extends JPanel {
     }
     void makePlayer(int id,JSONObject player) throws IOException, ClassNotFoundException {
         int[] cost=new int[6];
-        int[] discount= new int[6];
-        JSONObject developmentCards=player.getJSONObject("developmentCards");
-        String[] ids=JSONObject.getNames(developmentCards);
+        int[] discount= new int[5];
         JSONObject cash=player.getJSONObject("cash");
         cost[0]+=cash.getInt("white");
         cost[1]+=cash.getInt("blue");
@@ -79,21 +77,16 @@ public class Game extends JPanel {
         cost[3]+=cash.getInt("red");
         cost[4]+=cash.getInt("black");
         cost[5]+=cash.getInt("yellow");
-        if(ids!=null) {
-            for (String i : ids) {
-                JSONObject card = developmentCards.getJSONObject(i);
-                JSONObject discounts = card.getJSONObject("discount");
-                discount[0] += discounts.getInt("white");
-                discount[1] += discounts.getInt("blue");
-                discount[2] += discounts.getInt("green");
-                discount[3] += discounts.getInt("red");
-                discount[4] += discounts.getInt("black");
-                discount[5] = 0;
-            }
-        }
+        JSONObject discounts = player.getJSONObject("totalDiscount");
+        discount[0] += discounts.getInt("white");
+        discount[1] += discounts.getInt("blue");
+        discount[2] += discounts.getInt("green");
+        discount[3] += discounts.getInt("red");
+        discount[4] += discounts.getInt("black");
         int points=0;
-        players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],discount[5],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
+        players[id]=new Card(-1,cost[0],cost[1],cost[2],cost[3],cost[4],cost[5],discount[0],discount[1],discount[2],discount[3],discount[4],points,true,cardWidth,cardHeight,Width-cardWidth,Height-cardHeight,player.getString("nick"));
         add(players[id]);
+        players[id].setPoints(player.getInt("totalPrestige"));
         players[id].forceVisible();
         JSONObject claimedCardJSON = null;
         try {//Nothing else worked
@@ -415,7 +408,7 @@ public class Game extends JPanel {
                 row=board.getJSONObject("developmentCardsOnBoard").getJSONArray("level"+i);
             for(int j=0;j<row.length()+(i!=0?1:0);j++){
                 if(i!=0&&j==0){
-                    cards[i][j]=new Card(-1,0,0,0,0,0,0,0,0,0,0,0,0,0,true,cardWidth,cardHeight,x+cardWidth*j,y+cardHeight*i,"");
+                    cards[i][j]=new Card(-1,0,0,0,0,0,0,0,0,0,0,0,0,true,cardWidth,cardHeight,x+cardWidth*j,y+cardHeight*i,"");
                 }
                 else{
                     JSONObject card= row.getJSONObject(i!=0?j-1:j);
@@ -510,6 +503,15 @@ public class Game extends JPanel {
         System.out.println(response);
         verifyMove();
     }
+    private void parseSelectNoble(int id) throws IOException, ClassNotFoundException {
+        JSONObject request=new JSONObject();
+        request.put("request_type","select_noble");
+        request.put("noble_id",id);
+        System.out.println(request);
+        response=client.takeRequest(request);
+        System.out.println(response);
+        verifyMove();
+    }
     private void verifyMove() throws IOException, ClassNotFoundException {
         if(response.getString("answer_type").equals("move_verification")) {
             if (response.getString("result").equals("ok")) {
@@ -584,15 +586,5 @@ public class Game extends JPanel {
 
     private void endGame(JSONObject response) {
         communicate.setText("End of game. Winner: "+response.getString("winner"));
-    }
-
-    private void parseSelectNoble(int id) throws IOException, ClassNotFoundException {
-        JSONObject request=new JSONObject();
-        request.put("request_type","select_noble");
-        request.put("noble_id",id);
-        System.out.println(request);
-        response=client.takeRequest(request);
-        System.out.println(response);
-        verifyMove();
     }
 }

@@ -90,6 +90,7 @@ public class ClientHandler implements Runnable {
                     .toString();
             outputStream.writeObject(jsonString);
             outputStream.flush();
+            System.out.println(jsonString);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -136,6 +137,8 @@ public class ClientHandler implements Runnable {
         server.hashMap.put(jsonObject.getString("set_nick"),jsonObject.getString("client_id"));
         //ServerBoard.getInstance().addPlayer(jsonObject.getString("set_nick")); TODO: Tak można było dodać playera :(
         System.out.println(server.playersnicks.toString());
+        System.out.println(input);
+        System.out.println(response);
     }
 
     /**
@@ -159,6 +162,7 @@ public class ClientHandler implements Runnable {
 
         outputStream.writeObject(response);
         outputStream.flush();
+        System.out.println(response);
     }
 
 /*
@@ -193,7 +197,7 @@ public class ClientHandler implements Runnable {
                     response = new JSONObject()
                             .put("answer_type", answerType)
                             .put("result", result)
-                            .put("nobles", Arrays.toString(nobles))
+                            .put("nobles", nobles)
                             .toString();
                 }
                 else {
@@ -208,6 +212,7 @@ public class ClientHandler implements Runnable {
         }
         outputStream.writeObject(response);
         outputStream.flush();
+        System.out.println(response);
     }
 
     private boolean verifyMove(JSONObject jsonObject) throws IOException{
@@ -284,6 +289,7 @@ public class ClientHandler implements Runnable {
                 break;
             }
         }
+        System.out.println(request);
         return ok;
     }
 
@@ -311,6 +317,7 @@ public class ClientHandler implements Runnable {
         do {
             String input = (String) inputStream.readObject();
             jsonObject = new JSONObject(input);
+            System.out.println(input);
         } while(!verifyMove(jsonObject));
     }
     private synchronized void updategame() throws IOException, InterruptedException {
@@ -336,6 +343,7 @@ public class ClientHandler implements Runnable {
         String response = server.blockingQueue.take();
         outputStream.writeObject(response);
         outputStream.flush();
+        System.out.println(response);
     }
 
     private synchronized void increment() throws IOException, InterruptedException, TooMuchCashException, NobleNotSelectedException {

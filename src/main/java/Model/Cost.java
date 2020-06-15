@@ -44,7 +44,7 @@ public class Cost implements Serializable {
         return new Cost(
                 Math.max(white - discount.white, 0),
                 Math.max(green - discount.green, 0),
-                Math.max(blue - discount.black, 0),
+                Math.max(blue - discount.blue, 0),
                 Math.max(black - discount.black, 0),
                 Math.max(red - discount.red, 0));
     }

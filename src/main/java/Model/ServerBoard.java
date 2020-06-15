@@ -200,6 +200,8 @@ public class ServerBoard extends ClientBoard implements Serializable{
 
         Noble noble = nobles.getNobleById(nobleId);
         activePlayer.addNoble(noble);
+
+        nobles.removeNobleById(nobleId);
     }
 
     /**

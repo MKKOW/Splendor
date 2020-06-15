@@ -34,7 +34,6 @@ public class Card extends JPanel{
                 noble?text.equals("Claimed Card")?card.getJSONObject("discount").getInt("green"):0:card.getJSONObject("discount").getInt("green"),
                 noble?text.equals("Claimed Card")?card.getJSONObject("discount").getInt("red"):0:card.getJSONObject("discount").getInt("red"),
                 noble?text.equals("Claimed Card")?card.getJSONObject("discount").getInt("black"):0:card.getJSONObject("discount").getInt("black"),
-                0,
                 card.getInt("prestige"),
                 noble,
                 width,
@@ -44,18 +43,20 @@ public class Card extends JPanel{
                 text);
     }
     public Card(int id,int costWhite,int costBlue,int costGreen,int costRed,int costBlack,int costYellow,
-                int discountWhite,int discountBlue,int discountGreen,int discountRed,int discountBlack,int discountYellow,
+                int discountWhite,int discountBlue,int discountGreen,int discountRed,int discountBlack,
                 int points,boolean noble,int width,int height,int x, int y,String text) {
         super(null);
         setBackground(Color.RED);
         costs=new coinStack[6];
-        discount=new coinStack[6];
+        discount=new coinStack[5];
         pointsField=new coinStack(points,"black",Color.WHITE);
         costField=new JPanel(null);
         discountField=new JPanel(null);
         textField=new JLabel(text);
         for(int i=0;i<6;i++) {
             costs[i] = new coinStack();
+        }
+        for(int i=0;i<5;i++){
             discount[i]=new coinStack();
         }
         this.id=id;
@@ -65,7 +66,7 @@ public class Card extends JPanel{
         this.width=width;
         this.height=height;
         initialPoint=new Point(X,Y);
-        set(costWhite,costBlue,costGreen,costRed,costBlack,costYellow,discountWhite,discountBlue,discountGreen,discountRed,discountBlack,discountYellow);
+        set(costWhite,costBlue,costGreen,costRed,costBlack,costYellow,discountWhite,discountBlue,discountGreen,discountRed,discountBlack);
         setPoints(points);
         setSize(width,height);
         setLocation(x,y);
@@ -134,7 +135,7 @@ public class Card extends JPanel{
         pointsField.setAmount(points);
     }
     public void set(int White,int Blue,int Green, int Red,int Black,int Yellow,
-                    int WhiteDis,int BlueDis,int GreenDis, int RedDis,int BlackDis,int YellowDis){
+                    int WhiteDis,int BlueDis,int GreenDis, int RedDis,int BlackDis){
         costs[0].set(White,"black",Color.WHITE);
         costs[1].set(Blue,"white",Color.BLUE);
         costs[2].set(Green,"black",Color.GREEN);
@@ -146,7 +147,6 @@ public class Card extends JPanel{
         discount[2].set(GreenDis,"black",Color.GREEN);
         discount[3].set(RedDis,"black",Color.RED);
         discount[4].set(BlackDis,"white",Color.BLACK);
-        discount[5].set(Yellow,"black",Color.YELLOW);
         if(White!=0||Blue!=0||Green!=0||Red!=0||Black!=0) {
             setVisible(true);
         }
