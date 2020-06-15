@@ -12,3 +12,5 @@ Obok plików `.jar` muszą znajdować się wszystkie pliki zawarte w odpowiednic
 Serwer jest załadowany na maszynę wirtualną, uruchomioną na Google Cloud Platform, dostępną pod adresem `34.107.16.236` przed podłączeniem się do serwera należy wcześniej ręcznie uruchomić serwer na maszynie wirtualnej. Możliwa jest tylko jedna rozgrywka jednocześnie.
 
 Serwer zawsze uruchamia się na porcie `2000`.
+
+W pliku `Protokol.md` znajduję opis komunikacji między klientem, a serwerem.
