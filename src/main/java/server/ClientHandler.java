@@ -310,6 +310,7 @@ public class ClientHandler implements Runnable {
     private void verifyEndOfTurn() throws IOException, ClassNotFoundException {
         String input = (String) inputStream.readObject();
         JSONObject jsonObject = new JSONObject(input);
+        System.out.println(input);
         verifyMove(jsonObject);
     }
     private void turn() throws IOException, ClassNotFoundException {
@@ -355,7 +356,7 @@ public class ClientHandler implements Runnable {
     }
     public void checkGameOver() {
         winner = ServerBoard.getInstance().checkWin();
-        gameOver = winner != null;
+        gameOver =(winner != null);
     }
     public void gameOver() throws IOException {
         String response = new JSONObject()

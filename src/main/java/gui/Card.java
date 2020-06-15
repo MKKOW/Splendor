@@ -179,7 +179,7 @@ public class Card extends JPanel{
             discountField.setSize(stackWidth*j,stackHeight);
             discountField.setLocation(width-j*stackWidth,0);
             add(pointsField);
-            pointsField.setSize(stackWidth,stackHeight);
+            pointsField.setSize(stackWidth*2,stackHeight);
             pointsField.setLocation(0,0);
     }
 

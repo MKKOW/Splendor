@@ -58,6 +58,9 @@ public class Game extends JPanel {
         public void run() {
             try {
                 board = client.getCurrentBoard();
+                if(board.has("answer_type")&&board.get("answet_type").equals("game_over")){
+                    endGame(board);
+                }
                 clear();
                 loadboard();
                 done=true;
@@ -513,74 +516,80 @@ public class Game extends JPanel {
         verifyMove();
     }
     private void verifyMove() throws IOException, ClassNotFoundException {
-        if(response.getString("answer_type").equals("move_verification")) {
-            if (response.getString("result").equals("ok")) {
-                response = client.getResponse();
-                System.out.println(response);
-                if(response.getString("answer_type").equals("end_of_round")) {
-                    endOfRound();
+        switch (response.getString("answer_type")) {
+            case "move_verification":
+                if (response.getString("result").equals("ok")) {
+                    response = client.getResponse();
+                    System.out.println(response);
+                    if (response.getString("answer_type").equals("end_of_round")) {
+                        endOfRound();
+                    }
+                } else {
+                    message = "Illegal move";
+                    clear();
+                    loadboard();
                 }
-            }
-            else{
-                message = "Illegal move";
-                clear();
-                loadboard();
-            }
-        }else if(response.getString("answer_type").equals("end_of_round")){
+                break;
+            case "end_of_round":
                 endOfRound();
-        }
-        else if(response.getString("answer_type").equals("game_over")){
-            endGame(response);
+                break;
+            case "game_over":
+                endGame(response);
+                break;
         }
     }
     private void endOfRound() throws IOException, ClassNotFoundException {
-        if (response.getString("result").equals("ok")) {
-            board = client.getCurrentBoard();
-            if(board.toString().contains("game_over")){
-                endGame(board);
-            }
-            message = "Ok";
-            discard = false;
-            clear();
-            loadboard();
-        } else if(response.getString("result").equals("discard_gems")) {
-            message = "You have to discard some of your gems";
-            discard=true;
-            temporaryStacks = new int[5];
-            for (int i=0;i<5;i++){
-                temporaryStacks[i] = players[selfId].getCosts()[i].getAmount();
-            }
-            clear();
-            loadboard();
-            for (int i=0;i<5;i++) {
-                players[selfId].getCosts()[i].setAmount(temporaryStacks[i]);
-            }
-        } else if(response.getString("result").equals("select_noble")){
-            message = "Pick noble";
-            communicate.setText(message);
-            int len=response.getJSONArray("nobles").length();
-            int[] noble_ids = new int[len];
-            for(int i=0;i<len;i++){
-                noble_ids[i]=response.getJSONArray("nobles").getInt(i);
-            }
-            for(int i=0;i<cards[0].length;i++){
-                Card card = cards[0][i];
-                for(int j=0;j<len;j++){
-                    if(card.getId()==noble_ids[j]){
-                        card.setBackground(Color.LIGHT_GRAY);
-                        card.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mousePressed(MouseEvent e) {
-                                try {
-                                    parseSelectNoble(card.getId());
-                                } catch (IOException | ClassNotFoundException ioException) {
-                                    ioException.printStackTrace();
+        switch (response.getString("result")) {
+            case "ok":
+                board = client.getCurrentBoard();
+                if (board.toString().contains("game_over")) {
+                    endGame(board);
+                }
+                message = "Ok";
+                discard = false;
+                clear();
+                loadboard();
+                break;
+            case "discard_gems":
+                message = "You have to discard some of your gems";
+                discard = true;
+                temporaryStacks = new int[5];
+                for (int i = 0; i < 5; i++) {
+                    temporaryStacks[i] = players[selfId].getCosts()[i].getAmount();
+                }
+                clear();
+                loadboard();
+                for (int i = 0; i < 5; i++) {
+                    players[selfId].getCosts()[i].setAmount(temporaryStacks[i]);
+                }
+                break;
+            case "select_noble":
+                message = "Pick noble";
+                communicate.setText(message);
+                int len = response.getJSONArray("nobles").length();
+                int[] noble_ids = new int[len];
+                for (int i = 0; i < len; i++) {
+                    noble_ids[i] = response.getJSONArray("nobles").getInt(i);
+                }
+                for (int i = 0; i < cards[0].length; i++) {
+                    Card card = cards[0][i];
+                    for (int j = 0; j < len; j++) {
+                        if (card.getId() == noble_ids[j]) {
+                            card.setBackground(Color.LIGHT_GRAY);
+                            card.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mousePressed(MouseEvent e) {
+                                    try {
+                                        parseSelectNoble(card.getId());
+                                    } catch (IOException | ClassNotFoundException ioException) {
+                                        ioException.printStackTrace();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
-            }
+                break;
         }
     }
 

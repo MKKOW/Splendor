@@ -85,17 +85,17 @@ public class ServerBoard extends ClientBoard implements Serializable{
     @Nullable
     public String checkWin() {
         // Check if all players did same amount of moves
-        for (Player player : players.values()) {
+        /*for (Player player : players.values()) {
             if (player.getNumberOfMoves() != activePlayer.getNumberOfMoves() - 1) {
                 return null;
             }
-        }
+        }*/
 
         String winner = null;
         int biggestPrestige = 0;
         // Check which player is above threshold and has biggest score
         for (Player player : players.values()) {
-            if (player.getTotalPrestige() > biggestPrestige && player.getTotalPrestige() >= Rules.prestigeWinCondition) {
+            if (player.getTotalPrestige() >= Rules.prestigeWinCondition) {
                 winner = player.getNick();
             }
         }

@@ -102,7 +102,7 @@ public class NoblesOnBoard implements Serializable {
         for (int i=0;i<nobles.length;i++) {
             if (nobles[i].getId() == nobleId) {
                 nobles[i] = null;
-                for(int j=i+1;j<nobles.length;i++){
+                for(int j=i+1;j<nobles.length;j++){
                     nobles[j-1]=nobles[j];
                 }
                 Noble[] tmp = new Noble[nobles.length-1];
