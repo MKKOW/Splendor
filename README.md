@@ -14,3 +14,9 @@ Obok plików `.jar` muszą znajdować się wszystkie pliki zawarte w odpowiednic
 Serwer zawsze uruchamia się na porcie `2000`.
 
 W pliku `Protokol.md` znajduję opis komunikacji między klientem, a serwerem.
+
+Skład oraz funkcje członków zespołu:
+* []() - Paweł Bohdanowicz - logika i model gry
+* [MKKOW](https://github.com/MKKOW) - Mikołaj Kowalski - interfejs graficzny oraz interakcja klienta z GUI
+* [wdrabik](https://github.com/wdrabik) - Wojciech Drabik - serwer oraz komunikacja klient-serwer
+* [ahermani](https://github.com/ahermani) - Agnieszka Hermaniuk - serwer oraz komunikacja klient-serwer
