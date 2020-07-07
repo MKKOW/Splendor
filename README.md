@@ -17,6 +17,6 @@ W pliku `Protokol.md` znajduję opis komunikacji między klientem, a serwerem.
 
 Skład oraz funkcje członków zespołu:
 * [L0rp](https://github.com/L0rp) - Paweł Bohdanowicz - logika i model gry
-* [MKKOW](https://github.com/MKKOW) - Mikołaj Kowalski - interfejs graficzny oraz interakcja klienta z GUI
+* [MKKOW](https://github.com/MKKOW) - Mikołaj Kowalski - interfejs graficzny oraz interakcja klienta z GUI, testy i naprawa błedów, integracja kodu.
 * [wdrabik](https://github.com/wdrabik) - Wojciech Drabik - serwer oraz komunikacja klient-serwer
 * [ahermani](https://github.com/ahermani) - Agnieszka Hermaniuk - serwer oraz komunikacja klient-serwer
